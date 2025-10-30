@@ -1,7 +1,7 @@
 package com.spring.logitrack.controller;
 
 import com.spring.logitrack.dto.UserLoginDTO;
-import com.spring.logitrack.dto.UserRegisterDTO;
+import com.spring.logitrack.dto.UserCreateDTO;
 import com.spring.logitrack.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO dto) {
+    public ResponseEntity<?> register(@Valid @RequestBody UserCreateDTO dto) {
         return ResponseEntity.ok(service.register(dto));
     }
 

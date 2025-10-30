@@ -1,26 +1,18 @@
 package com.spring.logitrack.mapper;
 
-import com.spring.logitrack.dto.UserRegisterDTO;
+import com.spring.logitrack.dto.UserCreateDTO;
 import com.spring.logitrack.dto.UserResponseDTO;
 import com.spring.logitrack.entity.User;
+import org.mapstruct.*;
+import org.mapstruct.factory.Mappers;
 
-public class UserMapper {
+@Mapper(componentModel = "spring")
+public interface UserMapper {
 
-    public static User toEntity(UserRegisterDTO dto) {
-        User user = new User();
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
-        return user;
-    }
+    User toEntity(UserCreateDTO dto);
 
-    public static UserResponseDTO toResponse(User user) {
-        UserResponseDTO res = new UserResponseDTO();
-        res.setId(user.getId());
-        res.setName(user.getName());
-        res.setEmail(user.getEmail());
-        res.setActive(user.isActive());
-        res.setRole(user.getRole().name());
-        return res;
-    }
+    UserResponseDTO toResponse(User u);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void patch(@MappingTarget User user, UserCreateDTO dto);
 }
