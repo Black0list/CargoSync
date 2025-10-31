@@ -33,12 +33,16 @@ public class ProductService {
 
     public ProductResponseDTO get(Long id) {
         Product product = repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produit non trouvé"));
-        return mapper.toResponse(product);
+                .orElseThrow(() -> new RuntimeException("Product not Found"));
+
+        if (product.isActive()) {
+            return mapper.toResponse(product);
+        } else {
+            throw new RuntimeException("Product is unavailable");
+        }
     }
 
     public ProductResponseDTO create(ProductCreateDTO dto) {
-
         try {
             Product product = mapper.toEntity(dto);
             Product saved = repo.save(product);
@@ -52,15 +56,22 @@ public class ProductService {
     }
 
     public ProductResponseDTO update(Long id, ProductCreateDTO dto) {
-        Product product = repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produit non trouvé"));
-        mapper.patch(product, dto);
-        return mapper.toResponse(repo.save(product));
+        try {
+            Product product = repo.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Product not Found"));
+            mapper.patch(product, dto);
+            return mapper.toResponse(repo.save(product));
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().contains("products_sku_key")) {
+                throw new DuplicateResourceException("SKU already exists: " + dto.getSku());
+            }
+            throw e;
+        }
     }
 
     public void delete(Long id, boolean hard) {
         Product product = repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produit non trouvé"));
+                .orElseThrow(() -> new RuntimeException("Product not Found"));
         if (hard) repo.delete(product);
         else {
             product.setActive(false);

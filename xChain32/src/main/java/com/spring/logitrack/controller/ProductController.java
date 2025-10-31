@@ -73,7 +73,14 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id, @RequestParam(defaultValue = "false") boolean hard) {
-        service.delete(id, hard);
+    public ResponseEntity<?> delete(@PathVariable Long id, @RequestParam(defaultValue = "false") boolean hard) {
+        try {
+            service.delete(id, hard);
+            return ResponseEntity.ok(Map.of("message", "Product Successfully Deleted"));
+        } catch (Exception e){
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        }
     }
 }

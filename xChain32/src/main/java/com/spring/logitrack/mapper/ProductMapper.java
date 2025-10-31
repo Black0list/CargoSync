@@ -16,5 +16,13 @@ public interface ProductMapper {
     ProductResponseDTO toResponse(Product product);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "name", conditionExpression = "java(isNotBlank(dto.getName()))")
+    @Mapping(target = "description", conditionExpression = "java(isNotBlank(dto.getDescription()))")
+    @Mapping(target = "sku", conditionExpression = "java(isNotBlank(dto.getSku()))")
+    @Mapping(target = "unit", conditionExpression = "java(isNotBlank(dto.getUnit()))")
     void patch(@MappingTarget Product product, ProductCreateDTO dto);
+
+    default boolean isNotBlank(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
 }
