@@ -29,6 +29,10 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
+    @NotBlank
+    @Column(nullable = false)
+    private String description;
+
     @DecimalMin("0.0")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;

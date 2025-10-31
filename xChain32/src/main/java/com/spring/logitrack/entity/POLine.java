@@ -2,44 +2,37 @@ package com.spring.logitrack.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "products")
+@Table(name = "po_lines")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Product {
+public class POLine {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Column(unique = true, nullable = false)
-    private String sku;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "purchase_order_id", nullable = false)
+    private PurchaseOrder purchaseOrder;
 
-    @NotBlank
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
+    @Min(1)
     @Column(nullable = false)
-    private String name;
+    private int qty;
 
     @DecimalMin("0.0")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
-
-    @NotNull
-    @Column(nullable = false)
-    private String unit;
-
-    @Column(nullable = false)
-    private boolean active = true;
-
-    @NotBlank
-    private String imageUrl;
 }
