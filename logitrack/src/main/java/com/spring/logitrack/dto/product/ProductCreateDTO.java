@@ -27,5 +27,6 @@ public class ProductCreateDTO {
     @NotBlank
     private String unit;
 
+    @NotBlank
     private String imageUrl;
 }
