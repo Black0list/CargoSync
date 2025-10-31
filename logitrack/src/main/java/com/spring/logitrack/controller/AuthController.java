@@ -1,7 +1,7 @@
 package com.spring.logitrack.controller;
 
-import com.spring.logitrack.dto.UserLoginDTO;
-import com.spring.logitrack.dto.UserCreateDTO;
+import com.spring.logitrack.dto.user.UserLoginDTO;
+import com.spring.logitrack.dto.user.UserCreateDTO;
 import com.spring.logitrack.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

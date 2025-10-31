@@ -37,5 +37,9 @@ public class Product {
     @Column(nullable = false)
     private String unit;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
+    @NotBlank
     private String imageUrl;
 }

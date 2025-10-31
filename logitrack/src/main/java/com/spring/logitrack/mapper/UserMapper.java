@@ -1,10 +1,9 @@
 package com.spring.logitrack.mapper;
 
-import com.spring.logitrack.dto.UserCreateDTO;
-import com.spring.logitrack.dto.UserResponseDTO;
+import com.spring.logitrack.dto.user.UserCreateDTO;
+import com.spring.logitrack.dto.user.UserResponseDTO;
 import com.spring.logitrack.entity.User;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {

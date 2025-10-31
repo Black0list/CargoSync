@@ -1,9 +1,8 @@
 package com.spring.logitrack.controller;
 
-import com.spring.logitrack.dto.UserCreateDTO;
-import com.spring.logitrack.dto.UserResponseDTO;
+import com.spring.logitrack.dto.user.UserCreateDTO;
+import com.spring.logitrack.dto.user.UserResponseDTO;
 import com.spring.logitrack.service.UserService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +46,7 @@ public class UserController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody UserCreateDTO dto) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody UserCreateDTO dto) {
         try {
             UserResponseDTO u = service.update(id, dto);
             return ResponseEntity.ok(u);

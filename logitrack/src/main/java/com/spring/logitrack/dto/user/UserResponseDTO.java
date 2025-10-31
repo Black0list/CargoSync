@@ -1,4 +1,4 @@
-package com.spring.logitrack.dto;
+package com.spring.logitrack.dto.user;
 
 import lombok.Data;
 

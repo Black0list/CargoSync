@@ -1,8 +1,8 @@
 package com.spring.logitrack.service;
 
-import com.spring.logitrack.dto.UserLoginDTO;
-import com.spring.logitrack.dto.UserCreateDTO;
-import com.spring.logitrack.dto.UserResponseDTO;
+import com.spring.logitrack.dto.user.UserLoginDTO;
+import com.spring.logitrack.dto.user.UserCreateDTO;
+import com.spring.logitrack.dto.user.UserResponseDTO;
 import com.spring.logitrack.entity.User;
 import com.spring.logitrack.entity.enums.Role;
 import com.spring.logitrack.mapper.UserMapper;
