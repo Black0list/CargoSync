@@ -29,6 +29,9 @@ public class ProductCreateDTO {
     @NotNull
     private BigDecimal price;
 
+    @NotNull
+    private Long warehouseId;
+
     @NotBlank
     private String unit;
 
@@ -37,4 +40,5 @@ public class ProductCreateDTO {
 
     @NotBlank
     private String imageUrl;
+
 }

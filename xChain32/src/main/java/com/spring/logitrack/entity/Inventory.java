@@ -42,4 +42,16 @@ public class Inventory {
     @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<InventoryMovement> movements = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "Inventory{" +
+                "id=" + id +
+                ", warehouse=" + warehouse +
+                ", product=" + product +
+                ", qtyOnHand=" + qtyOnHand +
+                ", qtyReserved=" + qtyReserved +
+                ", movements=" + movements +
+                '}';
+    }
 }

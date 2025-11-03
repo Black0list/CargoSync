@@ -36,6 +36,22 @@ public class SalesOrder {
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @NotNull
+    @Column(nullable = false)
+    private String country;
+
+    @NotNull
+    @Column(nullable = false)
+    private String city;
+
+    @NotNull
+    @Column(nullable = false)
+    private String street;
+
+    @NotNull
+    @Column(nullable = false)
+    private String zip;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "warehouse_id", nullable = false)
     private Warehouse warehouse;
