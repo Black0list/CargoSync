@@ -28,6 +28,10 @@ public class Warehouse {
     @Column(nullable = false)
     private String name;
 
+    @NotBlank
+    @Column(nullable = false)
+    private String location;
+
     @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Inventory> inventories = new ArrayList<>();

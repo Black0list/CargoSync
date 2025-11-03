@@ -1,5 +1,6 @@
 package com.spring.logitrack.service;
 
+import com.spring.logitrack.dto.inventory.InventoryCreateDTO;
 import com.spring.logitrack.dto.product.ProductCreateDTO;
 import com.spring.logitrack.dto.product.ProductResponseDTO;
 import com.spring.logitrack.entity.Product;
@@ -18,11 +19,13 @@ public class ProductService {
 
     private final ProductRepository repo;
     private final ProductMapper mapper;
+    private final InventoryService inventoryService;
 
     @Autowired
-    public ProductService(ProductRepository repo, ProductMapper mapper) {
+    public ProductService(ProductRepository repo, ProductMapper mapper, InventoryService inventoryService) {
         this.repo = repo;
         this.mapper = mapper;
+        this.inventoryService = inventoryService;
     }
 
     public List<ProductResponseDTO> list() {
@@ -46,6 +49,13 @@ public class ProductService {
         try {
             Product product = mapper.toEntity(dto);
             Product saved = repo.save(product);
+            InventoryCreateDTO inventoryDTO = new InventoryCreateDTO();
+            inventoryDTO.setProductId(saved.getId());
+            inventoryDTO.setQtyReserved(0);
+            inventoryDTO.setQtyOnHand(0);
+            inventoryDTO.setWarehouseId(dto.getWarehouseId());
+            inventoryService.create(inventoryDTO);
+
             return mapper.toResponse(saved);
         } catch (DataIntegrityViolationException e) {
             if (e.getMessage().contains("products_sku_key")) {

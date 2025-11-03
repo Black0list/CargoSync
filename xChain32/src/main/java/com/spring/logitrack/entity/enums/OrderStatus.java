@@ -1,5 +1,5 @@
 package com.spring.logitrack.entity.enums;
 
 public enum OrderStatus {
-    CREATED, RESERVED, SHIPPED, DELIVERED, CANCELED
+    CREATED, RESERVED, SHIPPED, DELIVERED, CANCELLED
 }

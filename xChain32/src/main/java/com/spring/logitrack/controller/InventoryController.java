@@ -1,8 +1,8 @@
 package com.spring.logitrack.controller;
 
-import com.spring.logitrack.dto.warehouse.WarehouseCreateDTO;
-import com.spring.logitrack.dto.warehouse.WarehouseResponseDTO;
-import com.spring.logitrack.service.WarehouseService;
+import com.spring.logitrack.dto.inventory.InventoryCreateDTO;
+import com.spring.logitrack.dto.inventory.InventoryResponseDTO;
+import com.spring.logitrack.service.InventoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -11,29 +11,29 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/warehouses")
+@RequestMapping("/api/inventories")
 @RequiredArgsConstructor
-public class WarehouseController {
+public class InventoryController {
 
-    private final WarehouseService service;
+    private final InventoryService service;
 
     @PostMapping
-    public ResponseEntity<WarehouseResponseDTO> create(@Valid @RequestBody WarehouseCreateDTO dto) {
+    public ResponseEntity<InventoryResponseDTO> create(@Valid @RequestBody InventoryCreateDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
     }
 
     @GetMapping
-    public ResponseEntity<List<WarehouseResponseDTO>> list() {
+    public ResponseEntity<List<InventoryResponseDTO>> list() {
         return ResponseEntity.ok(service.list());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<WarehouseResponseDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<InventoryResponseDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<WarehouseResponseDTO> update(@PathVariable Long id, @RequestBody WarehouseCreateDTO dto) {
+    public ResponseEntity<InventoryResponseDTO> update(@PathVariable Long id, @RequestBody InventoryCreateDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
