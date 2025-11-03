@@ -133,12 +133,12 @@ public class SalesOrderService {
 
         InventoryMovementCreateDTO invMvtHelperDTO = new InventoryMovementCreateDTO();
         invMvtHelperDTO.setInventoryId(inventoryHelper.getId());
-        invMvtHelperDTO.setType(MovementType.TRANSFER_OUT);
+        invMvtHelperDTO.setType(MovementType.OUTBOUND);
         invMvtHelperDTO.setQty(qty);
 
         InventoryMovementCreateDTO invMvtDTO = new InventoryMovementCreateDTO();
         invMvtDTO.setInventoryId(inventory.getId());
-        invMvtDTO.setType(MovementType.TRANSFER_IN);
+        invMvtDTO.setType(MovementType.INBOUND);
         invMvtDTO.setQty(qty);
 
         inventoryRepository.save(inventoryHelper);
