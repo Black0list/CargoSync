@@ -30,6 +30,10 @@ public class Backorder {
     @Column(name = "qty_backordered", nullable = false)
     private int qtyBackordered;
 
+    @Min(10)
+    @Column(name = "extra_qty", nullable = false)
+    private int extraQty;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BackorderStatus status;

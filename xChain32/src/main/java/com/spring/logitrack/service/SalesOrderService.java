@@ -127,6 +127,7 @@ public class SalesOrderService {
         }
     }
 
+    @Transactional()
     protected void MakeExchangeBetweenWareHouses(Inventory inventoryHelper, Inventory inventory, int qty) {
         inventoryHelper.setQtyOnHand(inventoryHelper.getQtyOnHand() - qty);
         inventory.setQtyReserved(inventory.getQtyReserved() + qty);
