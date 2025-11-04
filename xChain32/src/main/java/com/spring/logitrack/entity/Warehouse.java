@@ -32,7 +32,10 @@ public class Warehouse {
     @Column(nullable = false)
     private String location;
 
-    @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Column(nullable = false)
+    private boolean active = true;
+
+    @OneToMany(mappedBy = "warehouse", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @Builder.Default
     private List<Inventory> inventories = new ArrayList<>();
 
