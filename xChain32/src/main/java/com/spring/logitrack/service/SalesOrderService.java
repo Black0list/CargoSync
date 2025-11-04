@@ -74,7 +74,7 @@ public class SalesOrderService {
                     .orElseThrow(() -> new RuntimeException("Product not found"));
 
             if(!product.isActive()){
-                throw new RuntimeException("Product is not active");
+                throw new RuntimeException("Product with name : "+product.getName()+" ,is not active");
             }
             Optional<Inventory> inventory = Optional.ofNullable(inventoryRepository.findInventoryByProduct_IdAndWarehouse_Id(product.getId(), warehouse.getId()));
 
