@@ -59,6 +59,14 @@ public class WarehouseService {
     public void delete(Long id) {
         Warehouse entity = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Warehouse not found"));
+
+        boolean hasSales = !entity.getSales().isEmpty();
+        boolean hasInventories = !entity.getInventories().isEmpty();
+
+        if (hasSales || hasInventories) {
+            throw new IllegalStateException("Cannot delete warehouse, it must be deactivated");
+        }
+
         repository.delete(entity);
     }
 }
