@@ -65,8 +65,8 @@ public class InventoryService {
         entity.setQtyOnHand(dto.getQtyOnHand());
         entity.setQtyReserved(dto.getQtyReserved());
 
-        if(dto.getQtyOnHand() < 0 || dto.getQtyReserved() < 0){
-            throw new RuntimeException("Cant provide a negative quantity");
+        if(dto.getQtyOnHand() <= 0 || dto.getQtyReserved() <= 0){
+            throw new RuntimeException("Cant provide a Zero negative quantity");
         }
 
         return mapper.toResponse(repository.save(entity));
