@@ -1,9 +1,11 @@
 package com.spring.logitrack.service;
 
+import com.spring.logitrack.dto.backorder.BackorderCreateDTO;
 import com.spring.logitrack.dto.inventoryMovement.InventoryMovementCreateDTO;
 import com.spring.logitrack.dto.salesOrder.SalesOrderCreateDTO;
 import com.spring.logitrack.dto.salesOrder.SalesOrderResponseDTO;
 import com.spring.logitrack.entity.*;
+import com.spring.logitrack.entity.enums.BackorderStatus;
 import com.spring.logitrack.entity.enums.MovementType;
 import com.spring.logitrack.entity.enums.OrderStatus;
 import com.spring.logitrack.mapper.SalesOrderMapper;
@@ -27,11 +29,12 @@ public class SalesOrderService {
     private final InventoryRepository inventoryRepository;
     private final InventoryService inventoryService;
     private final InventoryMovementService inventoryMovementService;
+    private final BackorderService backorderService;
 
     @Autowired
     public SalesOrderService(SalesOrderRepository orderRepo, UserRepository userRepo,
                              WarehouseRepository warehouseRepo, ProductRepository productRepo,
-                             SalesOrderMapper mapper, InventoryRepository inventoryRepository, InventoryService inventoryService ,InventoryMovementService inventoryMovementService) {
+                             SalesOrderMapper mapper, InventoryRepository inventoryRepository, InventoryService inventoryService , InventoryMovementService inventoryMovementService, BackorderService backorderService) {
         this.orderRepo = orderRepo;
         this.userRepo = userRepo;
         this.warehouseRepo = warehouseRepo;
@@ -40,6 +43,7 @@ public class SalesOrderService {
         this.inventoryRepository = inventoryRepository;
         this.inventoryService = inventoryService;
         this.inventoryMovementService = inventoryMovementService;
+        this.backorderService = backorderService;
     }
 
     public List<SalesOrderResponseDTO> list() {
@@ -67,7 +71,11 @@ public class SalesOrderService {
                 .city(dto.getCity())
                 .street(dto.getStreet())
                 .zip(dto.getZip())
+                .status(OrderStatus.CREATED)
                 .build();
+
+        SalesOrder saved = orderRepo.save(order);
+
 
         dto.getLines().forEach(lineDTO -> {
             Product product = productRepo.findById(lineDTO.getProductId())
@@ -95,11 +103,22 @@ public class SalesOrderService {
 
                 // CHECK OTHER WAREHOUSES FOR EXTRA QUANTITY
                 Optional<Inventory> inventoryHelper = inventoryService.getHelperInventory(product.getId(), qtyNeeded, inventory.get().getWarehouse().getId());
+
                 if(inventoryHelper.isPresent()){
+                    // MAKE EXCHANGE BETWEEN WAREHOUSES
                     MakeExchangeBetweenWareHouses(inventoryHelper.get(), inventory.get(), qtyNeeded);
                     QtyReserved += qtyNeeded;
                 } else {
-                    System.out.println("================= Supplier Called ================");
+                    // MAKE BACKORDER
+                    System.out.println("=========================== Supplier Called ===========================");
+                    BackorderCreateDTO backorderCreateDTO = new BackorderCreateDTO();
+                    backorderCreateDTO.setQtyBackordered(qtyNeeded);
+                    backorderCreateDTO.setSalesOrderId(saved.getId());
+                    backorderCreateDTO.setStatus(BackorderStatus.PENDING);
+                    backorderCreateDTO.setExtraQty(0);
+                    backorderCreateDTO.setProductId(product.getId());
+
+                    backorderService.create(backorderCreateDTO);
                 }
 
             } else {
