@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -64,15 +65,13 @@ public class InventoryService {
         entity.setQtyOnHand(dto.getQtyOnHand());
         entity.setQtyReserved(dto.getQtyReserved());
 
+        if(dto.getQtyOnHand() <= 0 || dto.getQtyReserved() <= 0){
+            throw new RuntimeException("Cant provide a Zero negative quantity");
+        }
+
         return mapper.toResponse(repository.save(entity));
     }
 
-    public InventoryResponseDTO patch(Long id, InventoryCreateDTO dto) {
-        Inventory entity = repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Inventory not found"));
-        mapper.patch(entity, dto);
-        return mapper.toResponse(repository.save(entity));
-    }
 
     public void delete(Long id) {
         Inventory entity = repository.findById(id)

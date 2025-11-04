@@ -13,4 +13,6 @@ public class WarehouseCreateDTO {
 
     @NotBlank
     private String location;
+
+    private boolean active = true;
 }

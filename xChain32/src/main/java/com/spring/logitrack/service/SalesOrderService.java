@@ -127,18 +127,19 @@ public class SalesOrderService {
         }
     }
 
+    @Transactional()
     protected void MakeExchangeBetweenWareHouses(Inventory inventoryHelper, Inventory inventory, int qty) {
         inventoryHelper.setQtyOnHand(inventoryHelper.getQtyOnHand() - qty);
         inventory.setQtyReserved(inventory.getQtyReserved() + qty);
 
         InventoryMovementCreateDTO invMvtHelperDTO = new InventoryMovementCreateDTO();
         invMvtHelperDTO.setInventoryId(inventoryHelper.getId());
-        invMvtHelperDTO.setType(MovementType.TRANSFER_OUT);
+        invMvtHelperDTO.setType(MovementType.OUTBOUND);
         invMvtHelperDTO.setQty(qty);
 
         InventoryMovementCreateDTO invMvtDTO = new InventoryMovementCreateDTO();
         invMvtDTO.setInventoryId(inventory.getId());
-        invMvtDTO.setType(MovementType.TRANSFER_IN);
+        invMvtDTO.setType(MovementType.INBOUND);
         invMvtDTO.setQty(qty);
 
         inventoryRepository.save(inventoryHelper);
