@@ -68,7 +68,7 @@ public class InventoryService {
         entity.setQtyOnHand(dto.getQtyOnHand());
         entity.setQtyReserved(dto.getQtyReserved());
 
-        if(dto.getQtyOnHand() <= 0 || dto.getQtyReserved() <= 0){
+        if(dto.getQtyOnHand() < 0 || dto.getQtyReserved() < 0){
             throw new RuntimeException("Cant provide a Zero negative quantity");
         }
 
@@ -106,6 +106,7 @@ public class InventoryService {
     }
 
     public Optional<Inventory> getHelperInventory(Long id, int qty, Long WarehouseId) {
-        return repository.findOneByProduct_IdAndQtyOnHandIsGreaterThanEqualAndWarehouse_IdNot(id, qty, WarehouseId);
+        System.out.println("ProductId : "+id + " ===== qty : "+qty+" Warehouse : "+WarehouseId);
+        return repository.findAvailableInventoryNative(id, qty, WarehouseId);
     }
 }

@@ -76,7 +76,6 @@ public class SalesOrderService {
 
         SalesOrder saved = orderRepo.save(order);
 
-
         dto.getLines().forEach(lineDTO -> {
             Product product = productRepo.findById(lineDTO.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
@@ -84,7 +83,12 @@ public class SalesOrderService {
             if(!product.isActive()){
                 throw new RuntimeException("Product with name : "+product.getName()+" ,is not active");
             }
-            Optional<Inventory> inventory = Optional.ofNullable(inventoryRepository.findInventoryByProduct_IdAndWarehouse_Id(product.getId(), warehouse.getId()));
+
+            System.out.println("WarehouseId : "+warehouse.getId() + " \n===================\nProductId : "+product.getId());
+
+            Optional<Inventory> inventory = inventoryRepository.findTopByProduct_IdAndWarehouse_IdOrderByIdDesc(product.getId(), warehouse.getId());
+
+            System.out.println("====================== 12121 ====================== ");
 
             if(inventory.isEmpty()){
                 throw new RuntimeException("Inventory of product with sku : "+product.getSku()+",not Found");
@@ -92,22 +96,22 @@ public class SalesOrderService {
 
             int QtyReserved;
 
-            if(lineDTO.getQtyOrdered() > inventory.get().getQtyOnHand()){
-                QtyReserved = inventory.get().getQtyOnHand();
+            if(lineDTO.getQtyOrdered() > (inventory.get().getQtyOnHand() - inventory.get().getQtyReserved())){
+                QtyReserved = inventory.get().getQtyOnHand() - inventory.get().getQtyReserved();
 
-                int qtyNeeded = lineDTO.getQtyOrdered() - inventory.get().getQtyOnHand();
-
-                inventory.get().setQtyReserved(inventory.get().getQtyOnHand() + inventory.get().getQtyReserved());
-                inventory.get().setQtyOnHand(0);
-
+                int qtyNeeded = lineDTO.getQtyOrdered() - (inventory.get().getQtyOnHand() - inventory.get().getQtyReserved());
 
                 // CHECK OTHER WAREHOUSES FOR EXTRA QUANTITY
                 Optional<Inventory> inventoryHelper = inventoryService.getHelperInventory(product.getId(), qtyNeeded, inventory.get().getWarehouse().getId());
+
 
                 if(inventoryHelper.isPresent()){
                     // MAKE EXCHANGE BETWEEN WAREHOUSES
                     MakeExchangeBetweenWareHouses(inventoryHelper.get(), inventory.get(), qtyNeeded);
                     QtyReserved += qtyNeeded;
+                    inventory.get().setQtyReserved(inventory.get().getQtyReserved() + lineDTO.getQtyOrdered());
+                    inventory.get().setQtyOnHand(inventory.get().getQtyOnHand() + qtyNeeded);
+                    order.setStatus(OrderStatus.RESERVED);
                 } else {
                     // MAKE BACKORDER
                     System.out.println("=========================== Supplier Called ===========================");
@@ -119,12 +123,13 @@ public class SalesOrderService {
                     backorderCreateDTO.setProductId(product.getId());
 
                     backorderService.create(backorderCreateDTO);
+                    inventory.get().setQtyReserved(inventory.get().getQtyReserved() + QtyReserved);
                 }
 
             } else {
                 QtyReserved = lineDTO.getQtyOrdered();
                 inventory.get().setQtyReserved(inventory.get().getQtyReserved() + lineDTO.getQtyOrdered());
-                inventory.get().setQtyOnHand(inventory.get().getQtyOnHand() - lineDTO.getQtyOrdered());
+                inventory.get().setQtyOnHand(inventory.get().getQtyOnHand() + lineDTO.getQtyOrdered());
                 order.setStatus(OrderStatus.RESERVED);
             }
 
@@ -149,7 +154,6 @@ public class SalesOrderService {
     @Transactional()
     protected void MakeExchangeBetweenWareHouses(Inventory inventoryHelper, Inventory inventory, int qty) {
         inventoryHelper.setQtyOnHand(inventoryHelper.getQtyOnHand() - qty);
-        inventory.setQtyReserved(inventory.getQtyReserved() + qty);
 
         InventoryMovementCreateDTO invMvtHelperDTO = new InventoryMovementCreateDTO();
         invMvtHelperDTO.setInventoryId(inventoryHelper.getId());
