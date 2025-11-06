@@ -2,6 +2,7 @@ package com.spring.logitrack.controller;
 
 import com.spring.logitrack.dto.salesOrder.SalesOrderCreateDTO;
 import com.spring.logitrack.dto.salesOrder.SalesOrderResponseDTO;
+import com.spring.logitrack.dto.salesOrder.SalesOrderResponseWithWarningsDTO;
 import com.spring.logitrack.service.SalesOrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class SalesOrderController {
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody SalesOrderCreateDTO dto) {
         try {
-            SalesOrderResponseDTO created = service.create(dto);
+            SalesOrderResponseWithWarningsDTO created = service.create(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         } catch (Exception e) {
             return ResponseEntity

@@ -2,6 +2,7 @@ package com.spring.logitrack.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -34,6 +35,11 @@ public class Warehouse {
 
     @Column(nullable = false)
     private boolean active = true;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "manager_id", nullable = false)
+    @NotNull
+    private User manager;
 
     @OneToMany(mappedBy = "warehouse", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @Builder.Default

@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class BackorderCreateDTO {
 
@@ -15,10 +17,13 @@ public class BackorderCreateDTO {
     private Long productId;
 
     @Min(1)
-    private int qtyBackordered;
+    private Integer qty;
 
-    @Min(10)
-    private int extraQty;
+    @Min(0)
+    private Integer extraQty;
+
+    @NotNull
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @NotNull
     private BackorderStatus status;

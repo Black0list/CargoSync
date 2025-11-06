@@ -1,15 +1,22 @@
 package com.spring.logitrack.service;
 
+import com.spring.logitrack.dto.user.UserResponseDTO;
 import com.spring.logitrack.dto.warehouse.WarehouseCreateDTO;
 import com.spring.logitrack.dto.warehouse.WarehouseResponseDTO;
+import com.spring.logitrack.entity.User;
 import com.spring.logitrack.entity.Warehouse;
+import com.spring.logitrack.entity.enums.Role;
+import com.spring.logitrack.mapper.UserMapper;
 import com.spring.logitrack.mapper.WarehouseMapper;
+import com.spring.logitrack.repository.UserRepository;
 import com.spring.logitrack.repository.WarehouseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,11 +25,30 @@ public class WarehouseService {
 
     private final WarehouseRepository repository;
     private final WarehouseMapper mapper;
+    private final UserRepository userRepo;
+    private final UserService userService;
 
     public WarehouseResponseDTO create(WarehouseCreateDTO dto) {
         if (repository.existsByCode(dto.getCode()))
             throw new IllegalArgumentException("Warehouse code already exists");
-        Warehouse entity = mapper.toEntity(dto);
+
+        Optional<User> user = userRepo.findByIdAndRole(dto.getManagerId(), Role.WAREHOUSE_MANAGER);
+
+        if(user.isEmpty()){
+            throw new NoSuchElementException("Manager not found");
+        }
+
+        if(!user.get().isActive()){
+            throw new NoSuchElementException("Manager is not active");
+        }
+
+        Warehouse entity = Warehouse.builder()
+                .code(dto.getCode())
+                .name(dto.getName())
+                .active(true)
+                .location(dto.getLocation())
+                .manager(user.get()).build();
+
         return mapper.toResponse(repository.save(entity));
     }
 

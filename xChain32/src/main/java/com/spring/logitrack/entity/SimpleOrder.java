@@ -7,17 +7,13 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "backorders")
+@Table(name = "simple_orders")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class BackOrder extends AbstractOrder {
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "sales_order_id", nullable = false)
-    private SalesOrder salesOrder;
+public class SimpleOrder extends AbstractOrder {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -27,10 +23,4 @@ public class BackOrder extends AbstractOrder {
     public BackorderStatus getStatus() {
         return status;
     }
-
-    @Override
-    public String toString() {
-        return super.toString();
-    }
 }
-

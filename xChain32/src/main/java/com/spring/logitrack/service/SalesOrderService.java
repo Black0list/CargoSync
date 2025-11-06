@@ -4,6 +4,8 @@ import com.spring.logitrack.dto.backorder.BackorderCreateDTO;
 import com.spring.logitrack.dto.inventoryMovement.InventoryMovementCreateDTO;
 import com.spring.logitrack.dto.salesOrder.SalesOrderCreateDTO;
 import com.spring.logitrack.dto.salesOrder.SalesOrderResponseDTO;
+import com.spring.logitrack.dto.salesOrder.SalesOrderResponseWithWarningsDTO;
+import com.spring.logitrack.dto.salesOrderLine.SalesOrderLineCreateDTO;
 import com.spring.logitrack.entity.*;
 import com.spring.logitrack.entity.enums.BackorderStatus;
 import com.spring.logitrack.entity.enums.MovementType;
@@ -15,6 +17,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,7 +61,7 @@ public class SalesOrderService {
         return mapper.toResponse(order);
     }
 
-    public SalesOrderResponseDTO create(SalesOrderCreateDTO dto) {
+    public SalesOrderResponseWithWarningsDTO create(SalesOrderCreateDTO dto) {
         User client = userRepo.findById(dto.getClientId())
                 .orElseThrow(() -> new RuntimeException("Client not found"));
         Warehouse warehouse = warehouseRepo.findById(dto.getWarehouseId())
@@ -76,76 +79,101 @@ public class SalesOrderService {
 
         SalesOrder saved = orderRepo.save(order);
 
-        dto.getLines().forEach(lineDTO -> {
+        List<String> warnings = new ArrayList<>();
+
+        for (SalesOrderLineCreateDTO lineDTO : dto.getLines()) {
+
+            // 1. Retrieve product
             Product product = productRepo.findById(lineDTO.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
 
-            if(!product.isActive()){
-                throw new RuntimeException("Product with name : "+product.getName()+" ,is not active");
+            // Skip inactive product but record warning
+            if (!product.isActive()) {
+                String warning = "Product with name '" + product.getName() + "' is inactive and was skipped.";
+                warnings.add(warning);
+                continue;
             }
 
-            System.out.println("WarehouseId : "+warehouse.getId() + " \n===================\nProductId : "+product.getId());
+            // 2. Get inventory
+            Optional<Inventory> optInventory =
+                    inventoryRepository.findTopByProduct_IdAndWarehouse_IdOrderByIdDesc(
+                            product.getId(), warehouse.getId());
 
-            Optional<Inventory> inventory = inventoryRepository.findTopByProduct_IdAndWarehouse_IdOrderByIdDesc(product.getId(), warehouse.getId());
-
-            System.out.println("====================== 12121 ====================== ");
-
-            if(inventory.isEmpty()){
-                throw new RuntimeException("Inventory of product with sku : "+product.getSku()+",not Found");
+            if (optInventory.isEmpty()) {
+                String warning = "Inventory not found for product SKU '" + product.getSku() + "'.";
+                warnings.add(warning);
+                continue;
             }
 
-            int QtyReserved;
+            Inventory inventory = optInventory.get();
+            int availableQty = inventory.getQtyOnHand() - inventory.getQtyReserved();
+            int qtyReserved;
 
-            if(lineDTO.getQtyOrdered() > (inventory.get().getQtyOnHand() - inventory.get().getQtyReserved())){
-                QtyReserved = inventory.get().getQtyOnHand() - inventory.get().getQtyReserved();
+            // 3. Check if enough stock available
+            if (lineDTO.getQtyOrdered() > availableQty) {
 
-                int qtyNeeded = lineDTO.getQtyOrdered() - (inventory.get().getQtyOnHand() - inventory.get().getQtyReserved());
+                qtyReserved = availableQty;
+                int qtyNeeded = lineDTO.getQtyOrdered() - availableQty;
 
-                // CHECK OTHER WAREHOUSES FOR EXTRA QUANTITY
-                Optional<Inventory> inventoryHelper = inventoryService.getHelperInventory(product.getId(), qtyNeeded, inventory.get().getWarehouse().getId());
+                // 4. Try helper warehouse
+                Optional<Inventory> optHelper = inventoryService
+                        .getHelperInventory(product.getId(), qtyNeeded, inventory.getWarehouse().getId());
 
+                if (optHelper.isPresent()) {
+                    Inventory helper = optHelper.get();
 
-                if(inventoryHelper.isPresent()){
-                    // MAKE EXCHANGE BETWEEN WAREHOUSES
-                    MakeExchangeBetweenWareHouses(inventoryHelper.get(), inventory.get(), qtyNeeded);
-                    QtyReserved += qtyNeeded;
-                    inventory.get().setQtyReserved(inventory.get().getQtyReserved() + lineDTO.getQtyOrdered());
-                    inventory.get().setQtyOnHand(inventory.get().getQtyOnHand() + qtyNeeded);
+                    // Exchange stock between warehouses
+                    MakeExchangeBetweenWareHouses(helper, inventory, qtyNeeded);
+
+                    qtyReserved += qtyNeeded;
+                    inventory.setQtyReserved(inventory.getQtyReserved() + lineDTO.getQtyOrdered());
+                    inventory.setQtyOnHand(inventory.getQtyOnHand() + qtyNeeded);
                     order.setStatus(OrderStatus.RESERVED);
-                } else {
-                    // MAKE BACKORDER
-                    System.out.println("=========================== Supplier Called ===========================");
-                    BackorderCreateDTO backorderCreateDTO = new BackorderCreateDTO();
-                    backorderCreateDTO.setQtyBackordered(qtyNeeded);
-                    backorderCreateDTO.setSalesOrderId(saved.getId());
-                    backorderCreateDTO.setStatus(BackorderStatus.PENDING);
-                    backorderCreateDTO.setExtraQty(0);
-                    backorderCreateDTO.setProductId(product.getId());
 
-                    backorderService.create(backorderCreateDTO);
-                    inventory.get().setQtyReserved(inventory.get().getQtyReserved() + QtyReserved);
+                } else {
+                    // Create backorder
+                    System.out.println("Quantity is ========== : "+qtyNeeded);
+                    BackorderCreateDTO backorder = new BackorderCreateDTO();
+                    backorder.setQty(qtyNeeded);
+                    backorder.setSalesOrderId(saved.getId());
+                    backorder.setStatus(BackorderStatus.PENDING);
+                    backorder.setExtraQty(0);
+                    backorder.setProductId(product.getId());
+                    backorderService.create(backorder);
+
+                    inventory.setQtyReserved(inventory.getQtyReserved() + qtyReserved);
+
+                    String warning = "Backorder created for product SKU '" + product.getSku()
+                            + "' due to insufficient quantity (" + qtyNeeded + " units).";
+                    warnings.add(warning);
+                    order.setStatus(OrderStatus.BACKORDER);
                 }
 
             } else {
-                QtyReserved = lineDTO.getQtyOrdered();
-                inventory.get().setQtyReserved(inventory.get().getQtyReserved() + lineDTO.getQtyOrdered());
-                inventory.get().setQtyOnHand(inventory.get().getQtyOnHand() + lineDTO.getQtyOrdered());
+                // Sufficient stock
+                qtyReserved = lineDTO.getQtyOrdered();
+                inventory.setQtyReserved(inventory.getQtyReserved() + lineDTO.getQtyOrdered());
+                inventory.setQtyOnHand(inventory.getQtyOnHand() + lineDTO.getQtyOrdered());
                 order.setStatus(OrderStatus.RESERVED);
             }
 
+            // 5. Add line
             SalesOrderLine line = new SalesOrderLine();
             line.setSalesOrder(order);
             line.setProduct(product);
             line.setPrice(product.getPrice());
             line.setQtyOrdered(lineDTO.getQtyOrdered());
-            line.setQtyReserved(QtyReserved);
+            line.setQtyReserved(qtyReserved);
             order.getLines().add(line);
 
-            inventoryRepository.save(inventory.get());
-        });
+            // 6. Save inventory
+            inventoryRepository.save(inventory);
+        }
 
         try {
-            return mapper.toResponse(orderRepo.save(order));
+            SalesOrder savedOrder = orderRepo.save(order);
+            SalesOrderResponseDTO responseDTO = mapper.toResponse(savedOrder);
+            return mapper.toResponse(responseDTO, warnings);
         } catch (Exception e) {
             throw new DataIntegrityViolationException("Error while saving order: " + e.getMessage());
         }
@@ -174,6 +202,10 @@ public class SalesOrderService {
     public SalesOrderResponseDTO update(Long id, SalesOrderCreateDTO dto) {
         SalesOrder existing = orderRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sales order not found"));
+
+        if((existing.getStatus().equals(OrderStatus.SHIPPED) || existing.getStatus().equals(OrderStatus.DELIVERED)) && dto.getStatus().equals(OrderStatus.CANCELLED)){
+            throw new RuntimeException("You cant Cant cancel the order its "+existing.getStatus().toString().toLowerCase());
+        }
 
         mapper.patch(existing, dto);
         return mapper.toResponse(orderRepo.save(existing));
