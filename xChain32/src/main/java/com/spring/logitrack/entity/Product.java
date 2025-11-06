@@ -46,4 +46,18 @@ public class Product {
 
     @NotBlank
     private String imageUrl;
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", sku='" + sku + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", unit='" + unit + '\'' +
+                ", active=" + active +
+                ", imageUrl='" + imageUrl + '\'' +
+                '}';
+    }
 }

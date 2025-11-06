@@ -37,4 +37,15 @@ public class PurchaseOrder {
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<POLine> lines = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "PurchaseOrder{" +
+                "id=" + id +
+                ", supplier=" + supplier +
+                ", status=" + status +
+                ", createdAt=" + createdAt +
+                ", lines=" + lines +
+                '}';
+    }
 }

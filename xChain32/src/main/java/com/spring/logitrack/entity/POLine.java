@@ -35,4 +35,15 @@ public class POLine {
     @DecimalMin("0.0")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
+
+    @Override
+    public String toString() {
+        return "POLine{" +
+                "id=" + id +
+                ", purchaseOrder=" + purchaseOrder +
+                ", product=" + product +
+                ", qty=" + qty +
+                ", price=" + price +
+                '}';
+    }
 }
