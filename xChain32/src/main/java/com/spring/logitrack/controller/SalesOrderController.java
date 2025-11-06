@@ -82,7 +82,7 @@ public class SalesOrderController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam String status) {
         try {
-            SalesOrderResponseDTO order = service.updateStatus(id, status);
+            SalesOrderResponseWithWarningsDTO order = service.updateStatus(id, status);
             return ResponseEntity.ok(order);
         } catch (Exception e) {
             return ResponseEntity
