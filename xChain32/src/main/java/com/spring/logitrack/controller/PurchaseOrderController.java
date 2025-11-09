@@ -2,6 +2,7 @@ package com.spring.logitrack.controller;
 
 import com.spring.logitrack.dto.purchaseOrder.PurchaseOrderCreateDTO;
 import com.spring.logitrack.dto.purchaseOrder.PurchaseOrderResponseDTO;
+import com.spring.logitrack.dto.salesOrder.SalesOrderResponseWithWarningsDTO;
 import com.spring.logitrack.service.PurchaseOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/purchase-orders")
@@ -24,8 +26,7 @@ public class PurchaseOrderController {
     }
 
     @PostMapping("/backorder/{backorderId}/supplier/{supplierId}")
-    public ResponseEntity<PurchaseOrderResponseDTO> createFromBackOrder(
-            @PathVariable Long backorderId, @PathVariable Long supplierId) {
+    public ResponseEntity<PurchaseOrderResponseDTO> createFromBackOrder(@PathVariable Long backorderId, @PathVariable Long supplierId) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(service.createFromBackOrder(backorderId, supplierId));
     }
@@ -40,10 +41,16 @@ public class PurchaseOrderController {
         return ResponseEntity.ok(service.findBySupplier(supplierId));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<PurchaseOrderResponseDTO> update(@PathVariable Long id,
-                                                           @RequestBody PurchaseOrderCreateDTO dto) {
-        return ResponseEntity.ok(service.update(id, dto));
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam String status) {
+        try {
+            PurchaseOrderResponseDTO order = service.updateStatus(id, status);
+            return ResponseEntity.ok(order);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}")

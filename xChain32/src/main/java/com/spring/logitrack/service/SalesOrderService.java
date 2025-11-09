@@ -1,6 +1,6 @@
 package com.spring.logitrack.service;
 
-import com.spring.logitrack.dto.backorder.BackorderCreateDTO;
+import com.spring.logitrack.dto.order.OrderCreateDTO;
 import com.spring.logitrack.dto.inventoryMovement.InventoryMovementCreateDTO;
 import com.spring.logitrack.dto.salesOrder.SalesOrderCreateDTO;
 import com.spring.logitrack.dto.salesOrder.SalesOrderResponseDTO;
@@ -155,8 +155,9 @@ public class SalesOrderService {
                     order.setStatus(OrderStatus.RESERVED);
                 } else {
                     // Create backorder
-                    BackorderCreateDTO backorder = new BackorderCreateDTO();
+                    OrderCreateDTO backorder = new OrderCreateDTO();
                     backorder.setSalesOrderId(order.getId());
+                    backorder.setType("BACKORDER");
                     backorder.setProductId(product.getId());
                     backorder.setQty(qtyNeeded);
                     backorder.setExtraQty(0);

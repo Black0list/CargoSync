@@ -1,5 +1,6 @@
 package com.spring.logitrack.entity;
 
+import com.spring.logitrack.entity.OrderType;
 import com.spring.logitrack.entity.enums.BackorderStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -8,13 +9,15 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "orders")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public abstract class AbstractOrder {
+public abstract class AbstractOrder implements OrderType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,26 +28,25 @@ public abstract class AbstractOrder {
     private Product product;
 
     @Min(1)
-    @Column(name = "qty", nullable = false)
+    @Column(nullable = false)
     private int qty;
 
     @Min(0)
-    @Column(name = "extra_qty", nullable = false)
+    @Column(nullable = false)
     private int extraQty;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(nullable = false)
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public abstract BackorderStatus getStatus();
-
-    @Override
-    public String toString() {
-        return "AbstractOrder{" +
-                "id=" + id +
-                ", product=" + product +
-                ", qty=" + qty +
-                ", extraQty=" + extraQty +
-                ", createdAt=" + createdAt +
-                '}';
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null)
+            createdAt = LocalDateTime.now();
     }
+
+    @OneToOne(mappedBy = "order")
+    private PurchaseOrder purchaseOrder;
+
+    public abstract BackorderStatus getStatus();
 }

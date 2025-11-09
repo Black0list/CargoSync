@@ -1,7 +1,7 @@
 package com.spring.logitrack.controller;
 
-import com.spring.logitrack.dto.backorder.BackorderCreateDTO;
-import com.spring.logitrack.dto.backorder.BackorderResponseDTO;
+import com.spring.logitrack.dto.order.OrderCreateDTO;
+import com.spring.logitrack.dto.order.OrderResponseDTO;
 import com.spring.logitrack.service.BackorderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,22 +18,22 @@ public class BackorderController {
     private final BackorderService service;
 
     @PostMapping
-    public ResponseEntity<BackorderResponseDTO> create(@Valid @RequestBody BackorderCreateDTO dto) {
+    public ResponseEntity<OrderResponseDTO> create(@Valid @RequestBody OrderCreateDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
     }
 
     @GetMapping
-    public ResponseEntity<List<BackorderResponseDTO>> list() {
+    public ResponseEntity<List<OrderResponseDTO>> list() {
         return ResponseEntity.ok(service.list());
     }
 
     @GetMapping("/order/{salesOrderId}")
-    public ResponseEntity<List<BackorderResponseDTO>> findByOrder(@PathVariable Long salesOrderId) {
+    public ResponseEntity<List<OrderResponseDTO>> findByOrder(@PathVariable Long salesOrderId) {
         return ResponseEntity.ok(service.findByOrder(salesOrderId));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BackorderResponseDTO> update(@PathVariable Long id, @RequestBody BackorderCreateDTO dto) {
+    public ResponseEntity<OrderResponseDTO> update(@PathVariable Long id, @RequestBody OrderCreateDTO dto) {
         return ResponseEntity.ok(service.updateStatus(id, dto));
     }
 

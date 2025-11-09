@@ -30,7 +30,10 @@ public class BackOrder extends AbstractOrder {
 
     @Override
     public String toString() {
-        return super.toString();
+        return "BackOrder{" +
+                "salesOrder=" + salesOrder.getId() +
+                ", status=" + status +
+                '}';
     }
 }
 

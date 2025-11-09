@@ -38,6 +38,10 @@ public class PurchaseOrder {
     @Builder.Default
     private List<POLine> lines = new ArrayList<>();
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "order_id")
+    private AbstractOrder order;
+
     @Override
     public String toString() {
         return "PurchaseOrder{" +

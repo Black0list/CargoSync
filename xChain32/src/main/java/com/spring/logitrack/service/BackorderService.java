@@ -1,11 +1,11 @@
 package com.spring.logitrack.service;
 
-import com.spring.logitrack.dto.backorder.BackorderCreateDTO;
-import com.spring.logitrack.dto.backorder.BackorderResponseDTO;
+import com.spring.logitrack.dto.order.OrderCreateDTO;
+import com.spring.logitrack.dto.order.OrderResponseDTO;
 import com.spring.logitrack.entity.BackOrder;
 import com.spring.logitrack.entity.Product;
 import com.spring.logitrack.entity.SalesOrder;
-import com.spring.logitrack.mapper.BackorderMapper;
+import com.spring.logitrack.mapper.BackOrderMapper;
 import com.spring.logitrack.repository.BackorderRepository;
 import com.spring.logitrack.repository.ProductRepository;
 import com.spring.logitrack.repository.SalesOrderRepository;
@@ -26,9 +26,9 @@ public class BackorderService {
     private final BackorderRepository backorderRepository;
     private final ProductRepository productRepository;
     private final SalesOrderRepository salesOrderRepository;
-    private final BackorderMapper mapper;
+    private final BackOrderMapper mapper;
 
-    public BackorderResponseDTO create(BackorderCreateDTO dto) {
+    public OrderResponseDTO create(OrderCreateDTO dto) {
         SalesOrder order = salesOrderRepository.findById(dto.getSalesOrderId())
                 .orElseThrow(() -> new EntityNotFoundException("Sales order not found"));
         Product product = productRepository.findById(dto.getProductId())
@@ -47,7 +47,7 @@ public class BackorderService {
     }
 
     @Transactional(readOnly = true)
-    public List<BackorderResponseDTO> list() {
+    public List<OrderResponseDTO> list() {
         return backorderRepository.findAll()
                 .stream()
                 .map(mapper::toResponse)
@@ -55,14 +55,14 @@ public class BackorderService {
     }
 
     @Transactional(readOnly = true)
-    public List<BackorderResponseDTO> findByOrder(Long salesOrderId) {
+    public List<OrderResponseDTO> findByOrder(Long salesOrderId) {
         return backorderRepository.findBySalesOrder_Id(salesOrderId)
                 .stream()
                 .map(mapper::toResponse)
                 .toList();
     }
 
-    public BackorderResponseDTO updateStatus(Long id, BackorderCreateDTO dto) {
+    public OrderResponseDTO updateStatus(Long id, OrderCreateDTO dto) {
         BackOrder existing = backorderRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Backorder not found"));
 

@@ -1,17 +1,14 @@
-package com.spring.logitrack.dto.backorder;
+package com.spring.logitrack.dto.order;
 
 import com.spring.logitrack.entity.enums.BackorderStatus;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Data
-public class BackorderResponseDTO {
+public class SimpleOrderResponseDTO {
     private Long id;
-    private Long salesOrderId;
+    private String type;
     private Long productId;
     private int qty;
     private int extraQty;
-    private LocalDateTime createdAt;
     private BackorderStatus status;
 }
