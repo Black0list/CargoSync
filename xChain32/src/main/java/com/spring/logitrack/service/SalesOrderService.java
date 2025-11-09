@@ -34,11 +34,13 @@ public class SalesOrderService {
     private final InventoryService inventoryService;
     private final InventoryMovementService inventoryMovementService;
     private final BackorderService backorderService;
+    private final SalesOrderRepository salesOrderRepo;
+    private final InventoryRepository inventoryRepo;
 
     @Autowired
     public SalesOrderService(SalesOrderRepository orderRepo, UserRepository userRepo,
                              WarehouseRepository warehouseRepo, ProductRepository productRepo,
-                             SalesOrderMapper mapper, InventoryRepository inventoryRepository, InventoryService inventoryService , InventoryMovementService inventoryMovementService, BackorderService backorderService) {
+                             SalesOrderMapper mapper, InventoryRepository inventoryRepository, InventoryService inventoryService , InventoryMovementService inventoryMovementService, BackorderService backorderService, InventoryRepository inventoryRepo, SalesOrderRepository salesOrderRepo) {
         this.orderRepo = orderRepo;
         this.userRepo = userRepo;
         this.warehouseRepo = warehouseRepo;
@@ -48,6 +50,8 @@ public class SalesOrderService {
         this.inventoryService = inventoryService;
         this.inventoryMovementService = inventoryMovementService;
         this.backorderService = backorderService;
+        this.salesOrderRepo = salesOrderRepo;
+        this.inventoryRepo = inventoryRepo;
     }
 
     public List<SalesOrderResponseDTO> list() {
@@ -229,11 +233,103 @@ public class SalesOrderService {
         SalesOrder order = orderRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sales order not found"));
 
+        if(status.equals(OrderStatus.CANCELLED.name()) && (order.getStatus().equals(OrderStatus.SHIPPED) || order.getStatus().equals(OrderStatus.DELIVERED))){
+            throw new RuntimeException("Cant change status while sales order in : "+order.getStatus().name().toUpperCase());
+        }
+
+        if(status.equals(OrderStatus.CANCELLED.name()) && order.getStatus().equals(OrderStatus.RESERVED)){
+            return cancelWhileReserve(order);
+        }
+
         if(status.equals(OrderStatus.RESERVED.name())){
             return reserve(order.getId());
-        } else {
-            order.setStatus(Enum.valueOf(com.spring.logitrack.entity.enums.OrderStatus.class, status));
-            return mapper.toResponse(mapper.toResponse(orderRepo.save(order)), new ArrayList<>());
+        } else if(status.equals(OrderStatus.SHIPPED.name())){
+            return shipping(order);
         }
+
+        return mapper.toResponse(mapper.toResponse(orderRepo.save(order)), new ArrayList<>());
     }
+
+    private SalesOrderResponseWithWarningsDTO shipping(SalesOrder order) {
+        List<String> warnings = new ArrayList<>();
+
+        for (SalesOrderLine line : order.getLines()) {
+
+            if(line.getQtyOrdered() != line.getQtyReserved()){
+                warnings.add("Cant Ship the product cuz still not fulfilled : "+line.getProduct().getName());
+                break;
+            }
+
+            Product product = line.getProduct();
+
+            Inventory inventory = inventoryRepo.findTopByProduct_IdAndWarehouse_IdOrderByIdDesc(product.getId(), order.getWarehouse().getId())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "No inventory found for product ID: " + product.getId()));
+
+            if (line.getQtyReserved() > 0) {
+
+                int newReserved = inventory.getQtyReserved() - line.getQtyReserved();
+                int newQtyOnHand = inventory.getQtyOnHand() - line.getQtyReserved();
+                inventory.setQtyReserved(newReserved);
+                inventory.setQtyOnHand(newQtyOnHand);
+
+            }
+
+            inventoryRepo.save(inventory);
+        }
+
+        if(warnings.isEmpty()) order.setStatus(OrderStatus.SHIPPED);
+        salesOrderRepo.saveAndFlush(order);
+
+
+        SalesOrderResponseDTO salesOrderResponseDTO = mapper.toResponse(order);
+
+        SalesOrderResponseWithWarningsDTO response = mapper.toResponse(salesOrderResponseDTO, warnings);
+        response.setWarnings(warnings);
+
+        return response;
+    }
+
+    protected SalesOrderResponseWithWarningsDTO cancelWhileReserve(SalesOrder order) {
+
+        List<String> warnings = new ArrayList<>();
+
+        for (SalesOrderLine line : order.getLines()) {
+            Product product = line.getProduct();
+
+            Inventory inventory = inventoryRepo.findTopByProduct_IdAndWarehouse_IdOrderByIdDesc(product.getId(), order.getWarehouse().getId())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "No inventory found for product ID: " + product.getId()));
+
+            int reservedBefore = line.getQtyReserved();
+
+            if (line.getQtyReserved() > 0) {
+
+                int newReserved = inventory.getQtyReserved() - line.getQtyReserved();
+                inventory.setQtyReserved(newReserved);
+
+                line.setQtyReserved(0);
+
+                warnings.add(String.format(
+                        "Reservation of %d units for product '%s' (SKU: %s) has been cancelled.",
+                        reservedBefore,
+                        product.getName(),
+                        product.getSku()
+                ));
+            }
+            inventoryRepo.save(inventory);
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+        salesOrderRepo.saveAndFlush(order);
+
+
+        SalesOrderResponseDTO salesOrderResponseDTO = mapper.toResponse(order);
+
+        SalesOrderResponseWithWarningsDTO response = mapper.toResponse(salesOrderResponseDTO, warnings);
+        response.setWarnings(warnings);
+
+        return response;
+    }
+
 }
