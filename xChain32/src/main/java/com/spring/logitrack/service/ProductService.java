@@ -7,6 +7,7 @@ import com.spring.logitrack.entity.Product;
 import com.spring.logitrack.exception.DuplicateResourceException;
 import com.spring.logitrack.mapper.ProductMapper;
 import com.spring.logitrack.repository.ProductRepository;
+import com.spring.logitrack.repository.SalesOrderLineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -20,12 +21,14 @@ public class ProductService {
     private final ProductRepository repo;
     private final ProductMapper mapper;
     private final InventoryService inventoryService;
+    private final SalesOrderLineRepository lineRepository;
 
     @Autowired
-    public ProductService(ProductRepository repo, ProductMapper mapper, InventoryService inventoryService) {
+    public ProductService(ProductRepository repo, ProductMapper mapper, InventoryService inventoryService, SalesOrderLineRepository salesOrderLineRepository) {
         this.repo = repo;
         this.mapper = mapper;
         this.inventoryService = inventoryService;
+        this.lineRepository = salesOrderLineRepository;
     }
 
     public List<ProductResponseDTO> list() {
@@ -82,8 +85,14 @@ public class ProductService {
     public void delete(Long id, boolean hard) {
         Product product = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not Found"));
-        if (hard) repo.delete(product);
-        else {
+        if (hard) {
+            boolean isUsed = lineRepository.existsByProduct(product);
+            if(isUsed){
+                throw new RuntimeException("cant delete product,its still related to some commands");
+            } else {
+                repo.delete(product);
+            }
+        } else {
             product.setActive(false);
             repo.save(product);
         }

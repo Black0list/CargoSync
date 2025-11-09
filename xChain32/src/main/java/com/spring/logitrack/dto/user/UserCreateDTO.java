@@ -29,5 +29,5 @@ public class UserCreateDTO {
     @NotNull(message = "Role is required")
     private Role role;
 
-    private boolean active = true;
+    private Boolean active = true;
 }

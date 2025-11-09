@@ -11,6 +11,7 @@ public interface WarehouseMapper {
     @Mapping(target = "code", expression = "java(dto.getCode().toUpperCase())")
     Warehouse toEntity(WarehouseCreateDTO dto);
 
+    @Mapping(source = "manager.name", target = "manager")
     WarehouseResponseDTO toResponse(Warehouse entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

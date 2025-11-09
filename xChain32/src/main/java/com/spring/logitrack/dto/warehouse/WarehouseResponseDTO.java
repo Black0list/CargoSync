@@ -8,4 +8,6 @@ public class WarehouseResponseDTO {
     private String code;
     private String name;
     private String location;
+    private String manager;
+    private boolean active;
 }

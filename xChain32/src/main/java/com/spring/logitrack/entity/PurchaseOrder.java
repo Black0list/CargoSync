@@ -37,4 +37,19 @@ public class PurchaseOrder {
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<POLine> lines = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "order_id")
+    private AbstractOrder order;
+
+    @Override
+    public String toString() {
+        return "PurchaseOrder{" +
+                "id=" + id +
+                ", supplier=" + supplier +
+                ", status=" + status +
+                ", createdAt=" + createdAt +
+                ", lines=" + lines +
+                '}';
+    }
 }

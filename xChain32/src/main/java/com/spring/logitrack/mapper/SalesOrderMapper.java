@@ -2,11 +2,14 @@ package com.spring.logitrack.mapper;
 
 import com.spring.logitrack.dto.salesOrder.SalesOrderCreateDTO;
 import com.spring.logitrack.dto.salesOrder.SalesOrderResponseDTO;
+import com.spring.logitrack.dto.salesOrder.SalesOrderResponseWithWarningsDTO;
 import com.spring.logitrack.dto.salesOrderLine.SalesOrderLineResponseDTO;
 import com.spring.logitrack.entity.SalesOrder;
 import com.spring.logitrack.entity.SalesOrderLine;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface SalesOrderMapper {
@@ -26,4 +29,8 @@ public interface SalesOrderMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void patch(@MappingTarget SalesOrder entity, SalesOrderCreateDTO dto);
+
+    @Mapping(source = "order", target = "order")
+    @Mapping(source = "warnings", target = "warnings")
+    SalesOrderResponseWithWarningsDTO toResponse(SalesOrderResponseDTO order, List<String> warnings);
 }
