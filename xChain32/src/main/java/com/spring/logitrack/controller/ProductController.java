@@ -71,6 +71,18 @@ public class ProductController {
         }
     }
 
+    @PatchMapping("/{sku}")
+    public ResponseEntity<?> update(@PathVariable String sku, @RequestParam boolean status) {
+        try {
+            ProductResponseDTO updated = service.updateStatus(sku, status);
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<?> delete(@PathVariable Long id, @RequestParam(defaultValue = "false") boolean hard) {
