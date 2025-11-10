@@ -63,4 +63,21 @@ public class SalesOrder {
 
     @OneToOne(mappedBy = "salesOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private Shipment shipment;
+
+    @Override
+    public String toString() {
+        return "SalesOrder{" +
+                "id=" + id +
+                ", client=" + client +
+                ", status=" + status +
+                ", createdAt=" + createdAt +
+                ", country='" + country + '\'' +
+                ", city='" + city + '\'' +
+                ", street='" + street + '\'' +
+                ", zip='" + zip + '\'' +
+                ", warehouse=" + warehouse +
+                ", lines=" + lines +
+                ", shipment=" + shipment +
+                '}';
+    }
 }
