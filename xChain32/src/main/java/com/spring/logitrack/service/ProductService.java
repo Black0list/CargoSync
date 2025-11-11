@@ -31,7 +31,6 @@ public class ProductService {
     private final InventoryRepository inventoryRepo;
     private final SalesOrderLineRepository lineRepository;
     private final S3Service s3Service;
-
     @Autowired
     public ProductService(
             ProductRepository repo,
@@ -129,36 +128,42 @@ public class ProductService {
         }
     }
 
-    public ProductResponseDTO updateStatus(String sku, boolean status){
-            Product product = repo.findBySku(sku)
-                    .orElseThrow(() -> new ResourceNotFoundException("Product not Found"));
+    public ProductResponseDTO updateStatus(String sku, boolean status) {
+        Product product = repo.findBySku(sku)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not Found"));
 
-            if(!status){
-                List<SalesOrderLine> lines =  lineRepository.findAllByProduct_Id(product.getId());
-                List<Inventory> inventories = inventoryRepo.findAllByProduct_Id(product.getId());
+        if (!status) {
+            List<SalesOrderLine> lines = lineRepository.findAllByProduct_Id(product.getId());
+            List<Inventory> inventories = inventoryRepo.findAllByProduct_Id(product.getId());
 
-                for (Inventory inv : inventories){
-                    if(inv.getQtyReserved() > 0 || inv.getQtyOnHand() > 0){
-                        throw new BusinessException("Product Still have qty in inventories");
-                    }
-                }
-
-                for (SalesOrderLine line : lines){
-                    System.out.println(line.getSalesOrder());
-                    if(Objects.nonNull(line.getSalesOrder())){
-                        if(line.getSalesOrder().getStatus().equals(OrderStatus.CREATED) || line.getSalesOrder().getStatus().equals(OrderStatus.RESERVED) || line.getSalesOrder().getStatus().equals(OrderStatus.BACKORDER)){
-                            throw new BusinessException("Product still related to a sales order with status : "+line.getSalesOrder().getStatus());
-                        }
-                    }
-
-                    if(line.getQtyReserved() > 0){
-                        throw new BusinessException("Product has been reserved cant be deactivated");
-                    }
+            for (Inventory inv : inventories) {
+                if (inv.getQtyReserved() > 0 || inv.getQtyOnHand() > 0) {
+                    throw new BusinessException("Product Still have qty in inventories");
                 }
             }
 
-            product.setActive(status);
-            return mapper.toResponse(repo.save(product));
+            for (SalesOrderLine line : lines) {
+                System.out.println(line.getSalesOrder());
+
+                if (Objects.nonNull(line.getSalesOrder())) {
+                    if (line.getSalesOrder().getStatus().equals(OrderStatus.CREATED)
+                            || line.getSalesOrder().getStatus().equals(OrderStatus.RESERVED)
+                            || line.getSalesOrder().getStatus().equals(OrderStatus.BACKORDER)) {
+                        throw new BusinessException(
+                                "Product still related to a sales order with status : "
+                                        + line.getSalesOrder().getStatus()
+                        );
+                    }
+                }
+
+                if (line.getQtyReserved() > 0) {
+                    throw new BusinessException("Product has been reserved cant be deactivated");
+                }
+            }
+        }
+
+        product.setActive(status);
+        return mapper.toResponse(repo.save(product));
     }
 
     public void delete(Long id, boolean hard) {
