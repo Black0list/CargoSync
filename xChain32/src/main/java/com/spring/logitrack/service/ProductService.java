@@ -22,13 +22,15 @@ public class ProductService {
     private final ProductMapper mapper;
     private final InventoryService inventoryService;
     private final SalesOrderLineRepository lineRepository;
+    private final S3Service s3Service;
 
     @Autowired
-    public ProductService(ProductRepository repo, ProductMapper mapper, InventoryService inventoryService, SalesOrderLineRepository salesOrderLineRepository) {
+    public ProductService(ProductRepository repo, ProductMapper mapper, InventoryService inventoryService, SalesOrderLineRepository salesOrderLineRepository, S3Service s3Service) {
         this.repo = repo;
         this.mapper = mapper;
         this.inventoryService = inventoryService;
         this.lineRepository = salesOrderLineRepository;
+        this.s3Service = s3Service;
     }
 
     public List<ProductResponseDTO> list() {
@@ -50,8 +52,19 @@ public class ProductService {
 
     public ProductResponseDTO create(ProductCreateDTO dto) {
         try {
+            if (dto.getImageUrls() == null || dto.getImageUrls().isEmpty()) {
+                throw new IllegalArgumentException("At least one image file is required.");
+            }
+
+            List<String> urls = dto.getImageUrls().stream()
+                    .map(s3Service::uploadFile)
+                    .toList();
+
             Product product = mapper.toEntity(dto);
+            product.setImageUrls(urls);
+
             Product saved = repo.save(product);
+
             InventoryCreateDTO inventoryDTO = new InventoryCreateDTO();
             inventoryDTO.setProductId(saved.getId());
             inventoryDTO.setQtyReserved(0);
@@ -67,6 +80,7 @@ public class ProductService {
             throw e;
         }
     }
+
 
     public ProductResponseDTO update(Long id, ProductCreateDTO dto) {
         try {

@@ -15,7 +15,6 @@ import java.util.List;
 @Component
 public class PurchaseOrderMapper {
 
-    // ✅ Create new PurchaseOrder from DTO
     public PurchaseOrder toEntity(PurchaseOrderCreateDTO dto, Supplier supplier) {
         PurchaseOrder po = new PurchaseOrder();
         po.setSupplier(supplier);
@@ -34,11 +33,7 @@ public class PurchaseOrderMapper {
         return po;
     }
 
-    // ✅ PATCH existing PurchaseOrder (partial update)
     public void patch(PurchaseOrder existing, PurchaseOrderCreateDTO dto) {
-        // Update supplier handled in service (don’t touch here)
-
-        // If new lines provided, replace them
         if (dto.getLines() != null && !dto.getLines().isEmpty()) {
             List<POLine> newLines = new ArrayList<>();
             for (POLineCreateDTO lineDTO : dto.getLines()) {
@@ -49,10 +44,8 @@ public class PurchaseOrderMapper {
             existing.setLines(newLines);
         }
 
-        // Keep status, createdAt, and order intact
     }
 
-    // ✅ Convert Entity → Response DTO
     public PurchaseOrderResponseDTO toResponse(PurchaseOrder entity) {
         PurchaseOrderResponseDTO dto = new PurchaseOrderResponseDTO();
         dto.setId(entity.getId());
@@ -61,7 +54,6 @@ public class PurchaseOrderMapper {
         dto.setStatus(entity.getStatus());
         dto.setCreatedAt(entity.getCreatedAt());
 
-        // Map lines
         List<POLineResponseDTO> lineDTOs = new ArrayList<>();
         for (POLine line : entity.getLines()) {
             POLineResponseDTO l = new POLineResponseDTO();
@@ -74,7 +66,6 @@ public class PurchaseOrderMapper {
         }
         dto.setLines(lineDTOs);
 
-        // Map the order (SimpleOrder or BackOrder)
         if (entity.getOrder() != null) {
             dto.setOrder(toOrderResponse(entity.getOrder()));
         }
@@ -82,7 +73,6 @@ public class PurchaseOrderMapper {
         return dto;
     }
 
-    // ✅ Convert polymorphic order entity → response DTO
     private OrderResponseDTO toOrderResponse(AbstractOrder order) {
         OrderResponseDTO dto = new OrderResponseDTO();
         dto.setId(order.getId());
