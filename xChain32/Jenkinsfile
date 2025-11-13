@@ -25,19 +25,16 @@ pipeline {
 
         stage('Build & Test') {
             steps {
+                echo "🧪 Running Maven tests..."
                 dir('xChain32') {
-                    echo "🧪 Running Maven tests..."
-                    sh """
-                        mvn -version
-                        mvn clean verify
-                    """
+                    sh 'mvn clean verify'
                 }
             }
             post {
                 always {
+                    echo "📦 Publishing test reports..."
                     dir('xChain32') {
-                        echo "📦 Publishing test reports..."
-                        junit '**/target/surefire-reports/*.xml'
+                        junit 'target/surefire-reports/*.xml'
                     }
                 }
             }
@@ -45,8 +42,8 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
+                echo "🔍 Running SonarQube analysis..."
                 dir('xChain32') {
-                    echo "🔍 Running SonarQube analysis..."
                     withSonarQubeEnv('SonarQube') {
                         sh """
                             mvn sonar:sonar \
@@ -63,7 +60,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo "🐳 Building Docker image..."
-                sh "docker build -t ${IMAGE} ."
+                sh "docker build -t ${IMAGE} xChain32"
             }
         }
 
@@ -80,11 +77,7 @@ pipeline {
     }
 
     post {
-        success {
-            echo "🚀 Pipeline completed successfully!"
-        }
-        failure {
-            echo "❌ Pipeline failed."
-        }
+        success { echo "🚀 Pipeline completed successfully!" }
+        failure { echo "❌ Pipeline failed." }
     }
 }
