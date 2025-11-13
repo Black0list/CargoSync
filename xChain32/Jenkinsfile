@@ -38,14 +38,6 @@ pipeline {
                     sh 'mvn clean test'
                 }
             }
-            post {
-                always {
-                    echo "📦 Publishing test reports..."
-                    dir('xChain32') {
-                        junit '**/target/surefire-reports/*.xml'
-                    }
-                }
-            }
         }
 
         stage('SonarQube Analysis') {
