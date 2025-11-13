@@ -49,7 +49,7 @@ pipeline {
                         mvn sonar:sonar \
                           -Dsonar.projectKey=CargoSync \
                           -Dsonar.projectName='CargoSync' \
-                          -Dsonar.host.url=http://YOUR_SONAR_IP:9000 \
+                          -Dsonar.host.url=http://http://38.242.220.11:9000 \
                           -Dsonar.login=${SONAR}
                     """
                 }
