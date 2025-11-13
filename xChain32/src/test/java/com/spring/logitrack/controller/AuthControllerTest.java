@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-class AuthControllerUnitTest {
+class AuthControllerTest {
 
     @Mock
     private UserService userService;

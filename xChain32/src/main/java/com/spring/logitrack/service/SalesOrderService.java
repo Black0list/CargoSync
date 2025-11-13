@@ -33,14 +33,14 @@ public class SalesOrderService {
     private final InventoryRepository inventoryRepository;
     private final InventoryService inventoryService;
     private final InventoryMovementService inventoryMovementService;
-    private final BackorderService backorderService;
+    private final BackOrderService backorderService;
     private final SalesOrderRepository salesOrderRepo;
     private final InventoryRepository inventoryRepo;
 
     @Autowired
     public SalesOrderService(SalesOrderRepository orderRepo, UserRepository userRepo,
                              WarehouseRepository warehouseRepo, ProductRepository productRepo,
-                             SalesOrderMapper mapper, InventoryRepository inventoryRepository, InventoryService inventoryService , InventoryMovementService inventoryMovementService, BackorderService backorderService, InventoryRepository inventoryRepo, SalesOrderRepository salesOrderRepo) {
+                             SalesOrderMapper mapper, InventoryRepository inventoryRepository, InventoryService inventoryService , InventoryMovementService inventoryMovementService, BackOrderService backorderService, InventoryRepository inventoryRepo, SalesOrderRepository salesOrderRepo) {
         this.orderRepo = orderRepo;
         this.userRepo = userRepo;
         this.warehouseRepo = warehouseRepo;

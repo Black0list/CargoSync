@@ -6,7 +6,7 @@ import com.spring.logitrack.entity.BackOrder;
 import com.spring.logitrack.entity.Product;
 import com.spring.logitrack.entity.SalesOrder;
 import com.spring.logitrack.mapper.BackOrderMapper;
-import com.spring.logitrack.repository.BackorderRepository;
+import com.spring.logitrack.repository.BackOrderRepository;
 import com.spring.logitrack.repository.ProductRepository;
 import com.spring.logitrack.repository.SalesOrderRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,12 +24,12 @@ import static org.mockito.Mockito.*;
 
 class BackOrderServiceTest {
 
-    @Mock private BackorderRepository backorderRepository;
+    @Mock private BackOrderRepository backorderRepository;
     @Mock private ProductRepository productRepository;
     @Mock private SalesOrderRepository salesOrderRepository;
     @Mock private BackOrderMapper mapper;
 
-    @InjectMocks private BackorderService service;
+    @InjectMocks private BackOrderService service;
 
     private OrderCreateDTO createDTO;
     private SalesOrder salesOrder;

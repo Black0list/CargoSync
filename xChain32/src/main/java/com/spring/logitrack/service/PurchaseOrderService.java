@@ -27,7 +27,7 @@ public class PurchaseOrderService {
     private final SupplierRepository supplierRepo;
     private final ProductRepository productRepo;
     private final SimpleOrderRepository simpleOrderRepo;
-    private final BackorderRepository backorderRepo;
+    private final BackOrderRepository backorderRepo;
     private final SalesOrderLineRepository salesOrderLineRepo;
     private final SalesOrderRepository salesOrderRepo;
     private final InventoryRepository inventoryRepo;

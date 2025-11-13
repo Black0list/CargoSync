@@ -6,7 +6,7 @@ import com.spring.logitrack.entity.BackOrder;
 import com.spring.logitrack.entity.Product;
 import com.spring.logitrack.entity.SalesOrder;
 import com.spring.logitrack.mapper.BackOrderMapper;
-import com.spring.logitrack.repository.BackorderRepository;
+import com.spring.logitrack.repository.BackOrderRepository;
 import com.spring.logitrack.repository.ProductRepository;
 import com.spring.logitrack.repository.SalesOrderRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,9 +21,9 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class BackorderService {
+public class BackOrderService {
 
-    private final BackorderRepository backorderRepository;
+    private final BackOrderRepository backorderRepository;
     private final ProductRepository productRepository;
     private final SalesOrderRepository salesOrderRepository;
     private final BackOrderMapper mapper;
