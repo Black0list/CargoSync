@@ -26,7 +26,6 @@ public class WarehouseService {
     private final WarehouseRepository repository;
     private final WarehouseMapper mapper;
     private final UserRepository userRepo;
-    private final UserService userService;
 
     public WarehouseResponseDTO create(WarehouseCreateDTO dto) {
         if (repository.existsByCode(dto.getCode()))

@@ -6,6 +6,7 @@ import com.spring.logitrack.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,8 +48,8 @@ public class ProductController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody ProductCreateDTO dto) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> create(@ModelAttribute ProductCreateDTO dto) {
         try {
             ProductResponseDTO created = service.create(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);

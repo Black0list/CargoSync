@@ -1,14 +1,13 @@
 package com.spring.logitrack.dto.product;
 
 import jakarta.persistence.Column;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -38,7 +37,7 @@ public class ProductCreateDTO {
     @Column(nullable = false)
     private boolean active = true;
 
-    @NotBlank
-    private String imageUrl;
+    @NotEmpty(message = "At least one image URL is required")
+    private List<MultipartFile> imageUrls;
 
 }

@@ -10,6 +10,8 @@ public interface ShipmentMapper {
 
     Shipment toEntity(ShipmentCreateDTO dto);
 
+    @Mapping(source = "salesOrder.id", target = "salesOrderId")
+    @Mapping(source = "warehouse.id", target = "warehouseId")
     ShipmentResponseDTO toResponse(Shipment entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

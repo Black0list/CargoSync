@@ -93,13 +93,12 @@ public class SalesOrderService {
                 continue;
             }
 
-            // No stock verification yet — only create order lines
             SalesOrderLine line = new SalesOrderLine();
             line.setSalesOrder(order);
             line.setProduct(product);
             line.setPrice(product.getPrice());
             line.setQtyOrdered(lineDTO.getQtyOrdered());
-            line.setQtyReserved(0); // will be updated later during reservation
+            line.setQtyReserved(0);
             order.getLines().add(line);
         }
 
@@ -112,7 +111,6 @@ public class SalesOrderService {
         }
     }
 
-    // =============== PHASE 2 : RESERVE =================== //
     public SalesOrderResponseWithWarningsDTO reserve(Long orderId) {
         SalesOrder order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Sales order not found"));
@@ -190,7 +188,6 @@ public class SalesOrderService {
         return mapper.toResponse(mapper.toResponse(saved), warnings);
     }
 
-    // Exchange stock between warehouses
     @Transactional
     protected void MakeExchangeBetweenWareHouses(Inventory inventoryHelper, Inventory inventory, int qty) {
         inventoryHelper.setQtyOnHand(inventoryHelper.getQtyOnHand() - qty);
