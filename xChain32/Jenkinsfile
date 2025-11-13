@@ -3,15 +3,23 @@ pipeline {
     agent any
 
     environment {
+        // DockerHub credentials from Jenkins
         DOCKERHUB = credentials('dockerhub')
+
+        // SonarQube token from Jenkins
         SONAR = credentials('sonar-token')
 
+        // AWS Credentials from Jenkins
         AWS_ACCESS_KEY = credentials('aws-access-key')
         AWS_SECRET_KEY = credentials('aws-secret-key')
         AWS_REGION_NAME = credentials('aws-region-name')
         AWS_BUCKET_NAME = credentials('aws-bucket-name')
 
+        // Docker image destination
         IMAGE = "black0list/cargosync:latest"
+
+        // SonarQube server URL
+        SONAR_HOST_URL = "http://38.242.220.11:9000"
     }
 
     stages {
@@ -27,14 +35,14 @@ pipeline {
             steps {
                 echo "🧪 Running Maven tests..."
                 dir('xChain32') {
-                    sh 'mvn clean verify'
+                    sh 'mvn clean test'
                 }
             }
             post {
                 always {
                     echo "📦 Publishing test reports..."
                     dir('xChain32') {
-                        junit 'target/surefire-reports/*.xml'
+                        junit '**/target/surefire-reports/*.xml'
                     }
                 }
             }
@@ -43,13 +51,13 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo "🔍 Running SonarQube analysis..."
-                dir('xChain32') {
-                    withSonarQubeEnv('SonarQube') {
+                withSonarQubeEnv('SonarQube') {
+                    dir('xChain32') {
                         sh """
                             mvn sonar:sonar \
                               -Dsonar.projectKey=CargoSync \
                               -Dsonar.projectName='CargoSync' \
-                              -Dsonar.host.url=http://38.242.220.11:9000 \
+                              -Dsonar.host.url=${SONAR_HOST_URL} \
                               -Dsonar.login=${SONAR}
                         """
                     }
@@ -60,7 +68,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo "🐳 Building Docker image..."
-                sh "docker build -t ${IMAGE} xChain32"
+                dir('xChain32') {
+                    sh "docker build -t ${IMAGE} ."
+                }
             }
         }
 
@@ -77,7 +87,12 @@ pipeline {
     }
 
     post {
-        success { echo "🚀 Pipeline completed successfully!" }
-        failure { echo "❌ Pipeline failed." }
+        success {
+            echo "🚀 Pipeline completed successfully!"
+        }
+        failure {
+            echo "❌ Pipeline failed."
+        }
     }
+
 }
