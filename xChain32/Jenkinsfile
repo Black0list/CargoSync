@@ -1,0 +1,87 @@
+pipeline {
+
+    agent any
+
+    environment {
+        // DockerHub credentials from Jenkins
+        DOCKERHUB = credentials('dockerhub')
+
+        // SonarQube token from Jenkins
+        SONAR = credentials('sonar-token')
+
+        // AWS Credentials from Jenkins
+        AWS_ACCESS_KEY = credentials('aws-access-key')
+        AWS_SECRET_KEY = credentials('aws-secret-key')
+        AWS_REGION_NAME = credentials('aws-region-name')
+        AWS_BUCKET_NAME = credentials('aws-bucket-name')
+
+        // Docker image destination
+        IMAGE = "black0list/cargosync:latest"
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                echo "📥 Pulling code from GitHub..."
+                checkout scm
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                echo "🧪 Running Maven tests..."
+                sh 'mvn clean verify'
+            }
+            post {
+                always {
+                    echo "📦 Publishing test reports..."
+                    junit '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                echo "🔍 Running SonarQube analysis..."
+                withSonarQubeEnv('SonarQube') {
+                    sh """
+                        mvn sonar:sonar \
+                          -Dsonar.projectKey=CargoSync \
+                          -Dsonar.projectName='CargoSync' \
+                          -Dsonar.host.url=http://YOUR_SONAR_IP:9000 \
+                          -Dsonar.login=${SONAR}
+                    """
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo "🐳 Building Docker image..."
+                sh "docker build -t ${IMAGE} ."
+            }
+        }
+
+        stage('Push to DockerHub') {
+            steps {
+                echo "📤 Pushing image to DockerHub..."
+                sh """
+                    echo "${DOCKERHUB_PSW}" | docker login \
+                        --username ${DOCKERHUB_USR} --password-stdin
+                    docker push ${IMAGE}
+                """
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "🚀 Pipeline completed successfully!"
+        }
+        failure {
+            echo "❌ Pipeline failed."
+        }
+    }
+
+}
