@@ -27,14 +27,17 @@ pipeline {
             steps {
                 dir('xChain32') {
                     echo "🧪 Running Maven tests..."
-                    sh 'mvn clean verify'
+                    sh """
+                        mvn -version
+                        mvn clean verify
+                    """
                 }
             }
             post {
                 always {
                     dir('xChain32') {
                         echo "📦 Publishing test reports..."
-                        junit testResults: 'target/surefire-reports/*.xml', allowEmptyResults: true
+                        junit '**/target/surefire-reports/*.xml'
                     }
                 }
             }
@@ -60,7 +63,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo "🐳 Building Docker image..."
-                sh "docker build -t ${IMAGE} xChain32"
+                sh "docker build -t ${IMAGE} ."
             }
         }
 
