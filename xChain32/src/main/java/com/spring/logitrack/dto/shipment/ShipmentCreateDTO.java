@@ -1,20 +1,23 @@
 package com.spring.logitrack.dto.shipment;
 
-import com.spring.logitrack.entity.enums.ShipmentStatus;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class ShipmentCreateDTO {
+
+    @NotNull
+    private Long salesOrderId;
+
+    @NotNull
+    private Long warehouseId;
+
     @NotBlank
     private String carrier;
 
     @NotBlank
     private String trackingNumber;
-
-    private ShipmentStatus status;
 
     @NotBlank
     private String street;
@@ -30,7 +33,4 @@ public class ShipmentCreateDTO {
 
     @NotBlank
     private String country;
-
-    private Long salesOrderId;
-    private Long warehouseId;
 }
