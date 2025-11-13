@@ -23,49 +23,55 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                echo "Pulling code from GitHub..."
+                echo "📥 Pulling code from GitHub..."
                 checkout scm
             }
         }
 
         stage('Build & Test') {
             steps {
-                echo "Running Maven tests..."
-                sh 'mvn clean verify'
+                dir('xChain32') {       // <<<<<<<<<< FIX
+                    echo "🧪 Running Maven tests..."
+                    sh 'mvn clean verify'
+                }
             }
             post {
                 always {
-                    echo "Publishing test reports..."
-                    junit '**/target/surefire-reports/*.xml'
+                    dir('xChain32') {   // <<<<<<<<<< FIX
+                        echo "📦 Publishing test reports..."
+                        junit '**/target/surefire-reports/*.xml'
+                    }
                 }
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                echo "Running SonarQube analysis..."
-                withSonarQubeEnv('SonarQube') {
-                    sh """
-                        mvn sonar:sonar \
-                          -Dsonar.projectKey=CargoSync \
-                          -Dsonar.projectName='CargoSync' \
-                          -Dsonar.host.url=http://http://38.242.220.11:9000 \
-                          -Dsonar.login=${SONAR}
-                    """
+                dir('xChain32') {       // <<<<<<<<<< FIX
+                    echo "🔍 Running SonarQube analysis..."
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                            mvn sonar:sonar \
+                              -Dsonar.projectKey=CargoSync \
+                              -Dsonar.projectName='CargoSync' \
+                              -Dsonar.host.url=http://YOUR_SONAR_IP:9000 \
+                              -Dsonar.login=${SONAR}
+                        """
+                    }
                 }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo "Building Docker image..."
-                sh "docker build -t ${IMAGE} ."
+                echo "🐳 Building Docker image..."
+                sh "docker build -t ${IMAGE} xChain32"    // <<<<<<<<<< FIX
             }
         }
 
         stage('Push to DockerHub') {
             steps {
-                echo "Pushing image to DockerHub..."
+                echo "📤 Pushing image to DockerHub..."
                 sh """
                     echo "${DOCKERHUB_PSW}" | docker login \
                         --username ${DOCKERHUB_USR} --password-stdin
@@ -77,10 +83,10 @@ pipeline {
 
     post {
         success {
-            echo "Pipeline completed successfully!"
+            echo "🚀 Pipeline completed successfully!"
         }
         failure {
-            echo "Pipeline failed."
+            echo "❌ Pipeline failed."
         }
     }
 
