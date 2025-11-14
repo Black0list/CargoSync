@@ -81,7 +81,7 @@ public class PurchaseOrderMapper {
         dto.setExtraQty(order.getExtraQty());
         dto.setStatus(order.getStatus());
 
-        if (order instanceof BackOrder bo) {
+        if (order instanceof Backorder bo) {
             dto.setType("BackOrder");
             dto.setSalesOrderId(bo.getSalesOrder() != null ? bo.getSalesOrder().getId() : null);
         } else if (order instanceof SimpleOrder) {

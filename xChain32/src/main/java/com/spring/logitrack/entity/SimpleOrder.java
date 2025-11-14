@@ -1,6 +1,5 @@
 package com.spring.logitrack.entity;
 
-import com.spring.logitrack.entity.AbstractOrder;
 import com.spring.logitrack.entity.enums.BackorderStatus;
 import jakarta.persistence.*;
 import lombok.*;

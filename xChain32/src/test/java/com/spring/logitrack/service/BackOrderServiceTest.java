@@ -2,11 +2,11 @@ package com.spring.logitrack.service;
 
 import com.spring.logitrack.dto.order.OrderCreateDTO;
 import com.spring.logitrack.dto.order.OrderResponseDTO;
-import com.spring.logitrack.entity.BackOrder;
+import com.spring.logitrack.entity.Backorder;
 import com.spring.logitrack.entity.Product;
 import com.spring.logitrack.entity.SalesOrder;
-import com.spring.logitrack.mapper.BackOrderMapper;
-import com.spring.logitrack.repository.BackOrderRepository;
+import com.spring.logitrack.mapper.BackorderMapper;
+import com.spring.logitrack.repository.BackorderRepository;
 import com.spring.logitrack.repository.ProductRepository;
 import com.spring.logitrack.repository.SalesOrderRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,19 +22,19 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class BackOrderServiceTest {
+class BackorderServiceTest {
 
-    @Mock private BackOrderRepository backorderRepository;
+    @Mock private BackorderRepository backorderRepository;
     @Mock private ProductRepository productRepository;
     @Mock private SalesOrderRepository salesOrderRepository;
-    @Mock private BackOrderMapper mapper;
+    @Mock private BackorderMapper mapper;
 
-    @InjectMocks private BackOrderService service;
+    @InjectMocks private BackorderService service;
 
     private OrderCreateDTO createDTO;
     private SalesOrder salesOrder;
     private Product product;
-    private BackOrder backOrder;
+    private Backorder backOrder;
     private OrderResponseDTO responseDTO;
 
     @BeforeEach
@@ -51,7 +51,7 @@ class BackOrderServiceTest {
         product = new Product();
         product.setId(2L);
 
-        backOrder = new BackOrder();
+        backOrder = new Backorder();
         backOrder.setId(10L);
 
         responseDTO = new OrderResponseDTO();
@@ -103,8 +103,8 @@ class BackOrderServiceTest {
 
     @Test
     void list_success() {
-        BackOrder b1 = new BackOrder(); b1.setId(1L);
-        BackOrder b2 = new BackOrder(); b2.setId(2L);
+        Backorder b1 = new Backorder(); b1.setId(1L);
+        Backorder b2 = new Backorder(); b2.setId(2L);
         OrderResponseDTO r1 = new OrderResponseDTO(); r1.setId(1L);
         OrderResponseDTO r2 = new OrderResponseDTO(); r2.setId(2L);
 
@@ -120,7 +120,7 @@ class BackOrderServiceTest {
 
     @Test
     void findByOrder_success() {
-        BackOrder b = new BackOrder(); b.setId(1L);
+        Backorder b = new Backorder(); b.setId(1L);
         OrderResponseDTO r = new OrderResponseDTO(); r.setId(1L);
         when(backorderRepository.findBySalesOrder_Id(1L)).thenReturn(List.of(b));
         when(mapper.toResponse(b)).thenReturn(r);

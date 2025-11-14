@@ -27,7 +27,7 @@ public class PurchaseOrderService {
     private final SupplierRepository supplierRepo;
     private final ProductRepository productRepo;
     private final SimpleOrderRepository simpleOrderRepo;
-    private final BackOrderRepository backorderRepo;
+    private final BackorderRepository backorderRepo;
     private final SalesOrderLineRepository salesOrderLineRepo;
     private final SalesOrderRepository salesOrderRepo;
     private final InventoryRepository inventoryRepo;
@@ -110,7 +110,7 @@ public class PurchaseOrderService {
 
 
     public PurchaseOrderResponseDTO createFromBackOrder(Long backorderId, Long supplierId) {
-        BackOrder backOrder = backorderRepo.findById(backorderId)
+        Backorder backOrder = backorderRepo.findById(backorderId)
                 .orElseThrow(() -> new EntityNotFoundException("BackOrder not found"));
         Supplier supplier = supplierRepo.findById(supplierId)
                 .orElseThrow(() -> new EntityNotFoundException("Supplier not found"));
@@ -182,7 +182,7 @@ public class PurchaseOrderService {
     }
 
     private void applyModificationsForBackOrder(PurchaseOrder order) {
-        BackOrder backOrder = (BackOrder) order.getOrder();
+        Backorder backOrder = (Backorder) order.getOrder();
         SalesOrder salesOrder = backOrder.getSalesOrder();
         Warehouse warehouse = salesOrder.getWarehouse();
         Product product = backOrder.getProduct();

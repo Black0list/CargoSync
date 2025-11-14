@@ -2,11 +2,12 @@ package com.spring.logitrack.service;
 
 import com.spring.logitrack.dto.order.OrderCreateDTO;
 import com.spring.logitrack.dto.order.OrderResponseDTO;
-import com.spring.logitrack.entity.BackOrder;
+import com.spring.logitrack.entity.Backorder;
 import com.spring.logitrack.entity.Product;
 import com.spring.logitrack.entity.SalesOrder;
-import com.spring.logitrack.mapper.BackOrderMapper;
-import com.spring.logitrack.repository.BackOrderRepository;
+import com.spring.logitrack.mapper.BackorderMapper;
+import com.spring.logitrack.mapper.BackorderMapper;
+import com.spring.logitrack.repository.BackorderRepository;
 import com.spring.logitrack.repository.ProductRepository;
 import com.spring.logitrack.repository.SalesOrderRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,12 +22,12 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class BackOrderService {
+public class BackorderService {
 
-    private final BackOrderRepository backorderRepository;
+    private final BackorderRepository backorderRepository;
     private final ProductRepository productRepository;
     private final SalesOrderRepository salesOrderRepository;
-    private final BackOrderMapper mapper;
+    private final BackorderMapper mapper;
 
     public OrderResponseDTO create(OrderCreateDTO dto) {
         SalesOrder order = salesOrderRepository.findById(dto.getSalesOrderId())
@@ -34,12 +35,12 @@ public class BackOrderService {
         Product product = productRepository.findById(dto.getProductId())
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
-        BackOrder entity = mapper.toEntity(dto);
+        Backorder entity = mapper.toEntity(dto);
         entity.setSalesOrder(order);
         entity.setProduct(product);
 
         try {
-            BackOrder saved = backorderRepository.save(entity);
+            Backorder saved = backorderRepository.save(entity);
             return mapper.toResponse(saved);
         } catch (Exception e) {
             throw new DataIntegrityViolationException("Error while saving backorder: " + e.getMessage());
@@ -63,7 +64,7 @@ public class BackOrderService {
     }
 
     public OrderResponseDTO updateStatus(Long id, OrderCreateDTO dto) {
-        BackOrder existing = backorderRepository.findById(id)
+        Backorder existing = backorderRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Backorder not found"));
 
         if(Objects.isNull(dto.getQty())) dto.setQty(existing.getQty());
@@ -86,12 +87,12 @@ public class BackOrderService {
             existing.setProduct(product);
         }
 
-        BackOrder saved = backorderRepository.save(existing);
+        Backorder saved = backorderRepository.save(existing);
         return mapper.toResponse(saved);
     }
 
     public void delete(Long id) {
-        BackOrder entity = backorderRepository.findById(id)
+        Backorder entity = backorderRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Backorder not found"));
         backorderRepository.delete(entity);
     }

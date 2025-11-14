@@ -2,7 +2,7 @@ package com.spring.logitrack.controller;
 
 import com.spring.logitrack.dto.order.OrderCreateDTO;
 import com.spring.logitrack.dto.order.OrderResponseDTO;
-import com.spring.logitrack.service.BackOrderService;
+import com.spring.logitrack.service.BackorderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BackorderController {
 
-    private final BackOrderService service;
+    private final BackorderService service;
 
     @PostMapping
     public ResponseEntity<OrderResponseDTO> create(@Valid @RequestBody OrderCreateDTO dto) {

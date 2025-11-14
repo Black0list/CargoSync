@@ -32,7 +32,7 @@ class SalesOrderServiceTest {
     @Mock private InventoryRepository inventoryRepo;
     @Mock private InventoryService inventoryService;
     @Mock private InventoryMovementService inventoryMovementService;
-    @Mock private BackOrderService backorderService;
+    @Mock private BackorderService backorderService;
     @Mock private SalesOrderMapper mapper;
 
     @InjectMocks private SalesOrderService service;
