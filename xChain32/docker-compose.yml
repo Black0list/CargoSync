@@ -5,7 +5,7 @@ services:
     build: .
     container_name: spring-backend
     ports:
-      - "8080:8080"
+      - "9090:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/logitrack
       SPRING_DATASOURCE_USERNAME: postgres
@@ -42,36 +42,6 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 
-  sonarqube:
-    image: sonarqube:latest
-    container_name: sonarqube
-    restart: always
-    ports:
-      - "9000:9000"
-    environment:
-      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
-      SONAR_JAVA_OPTS: "-Xms512m -Xmx512m"
-    volumes:
-      - sonarqube_data:/opt/sonarqube/data
-      - sonarqube_extensions:/opt/sonarqube/extensions
-
-  jenkins:
-    image: jenkins/jenkins:lts
-    container_name: jenkins
-    user: root
-    restart: always
-    ports:
-      - "8081:8080"
-      - "50000:50000"
-    volumes:
-      - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
-
 volumes:
   postgres_data:
   pgadmin_data:
-  jenkins_home:
-  sonarqube_data:
-  sonarqube_extensions:

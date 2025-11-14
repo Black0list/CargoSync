@@ -76,6 +76,16 @@ pipeline {
                 """
             }
         }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                    cd /apps/cargosync
+                    docker compose down
+                    docker compose up -d --build
+                '''
+            }
+        }
     }
 
     post {
