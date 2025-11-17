@@ -148,7 +148,6 @@ public class PurchaseOrderService {
 
     @Transactional
     public PurchaseOrderResponseDTO updateStatus(Long id, String status) {
-        System.out.println("==========================================");
         PurchaseOrder order = poRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Purchase order not found"));
 
@@ -159,14 +158,14 @@ public class PurchaseOrderService {
             throw new IllegalArgumentException("Invalid status: " + status);
         }
 
-//        if (order.getStatus() == newStatus)
-//            throw new IllegalStateException("Purchase order already has status: " + newStatus);
-//
-//        if (order.getStatus().equals(POStatus.RECEIVED) && newStatus.equals(POStatus.APPROVED))
-//            throw new IllegalStateException("Can't revert status from RECEIVED to APPROVED");
+        if (order.getStatus() == newStatus)
+            throw new IllegalStateException("Purchase order already has status: " + newStatus);
+
+        if (order.getStatus().equals(POStatus.RECEIVED) && newStatus.equals(POStatus.APPROVED))
+            throw new IllegalStateException("Can't revert status from RECEIVED to APPROVED");
 
         if(newStatus == POStatus.RECEIVED){
-            if (order.getOrder().getClass().getSimpleName().equals("BackOrder")){
+            if (order.getOrder() instanceof Backorder) {
                 applyModificationsForBackOrder(order);
             } else {
                 applyModificationsForSimpleOrder(order);
