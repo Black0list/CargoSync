@@ -68,7 +68,7 @@ class SalesOrderControllerTest {
         var result = controller.list();
 
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat((List<?>) result.getBody()).hasSize(1);
+        assertThat(((List<?>) result.getBody()).size()).isEqualTo(1);
     }
 
     @Test
@@ -100,8 +100,8 @@ class SalesOrderControllerTest {
         var result = controller.get(10L);
 
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat((Map<String, String>) result.getBody())
-                .containsEntry("message", "Product Successfully Deleted");
+        assertThat(((Map<?, ?>) result.getBody()).get("message"))
+                .isEqualTo("Order not found");
     }
 
     // ======================================================================
@@ -118,7 +118,7 @@ class SalesOrderControllerTest {
         var body = (SalesOrderResponseWithWarningsDTO) result.getBody();
 
         assertThat(body.getOrder().getId()).isEqualTo(1L);
-        assertThat(body.getWarnings()).hasSize(1);
+        assertThat(body.getWarnings().size()).isEqualTo(1);
     }
 
     @Test
@@ -128,8 +128,8 @@ class SalesOrderControllerTest {
         var result = controller.create(createDTO);
 
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat((Map<String, String>) result.getBody())
-                .containsEntry("message", "Invalid data");
+        assertThat(((Map<?, ?>) result.getBody()).get("message"))
+                .isEqualTo("Invalid data");
     }
 
     // ======================================================================
@@ -153,8 +153,8 @@ class SalesOrderControllerTest {
         var result = controller.update(5L, createDTO);
 
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat((Map<String, String>) result.getBody())
-                .containsEntry("message", "Update failed");
+        assertThat(((Map<?, ?>) result.getBody()).get("message"))
+                .isEqualTo("Update failed");
     }
 
     // ======================================================================
@@ -170,7 +170,7 @@ class SalesOrderControllerTest {
 
         var body = (SalesOrderResponseWithWarningsDTO) result.getBody();
         assertThat(body.getOrder().getId()).isEqualTo(1L);
-        assertThat(body.getWarnings()).hasSize(1);
+        assertThat(body.getWarnings().size()).isEqualTo(1);
     }
 
     @Test
@@ -181,8 +181,8 @@ class SalesOrderControllerTest {
         var result = controller.updateStatus(10L, "INVALID");
 
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat((Map<String, String>) result.getBody())
-                .containsEntry("message", "Invalid status");
+        assertThat(((Map<?, ?>) result.getBody()).get("message"))
+                .isEqualTo("Invalid status");
     }
 
     // ======================================================================
