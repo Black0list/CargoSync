@@ -51,7 +51,7 @@ class ProductControllerTest {
         var result = controller.list();
 
         assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
-        assertThat(((List<?>) result.getBody()).size()).isEqualTo(1);
+        assertThat((List<?>) result.getBody()).hasSize(1);
     }
 
     @Test
@@ -145,8 +145,8 @@ class ProductControllerTest {
         var result = controller.delete(3L, false);
 
         assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
-        assertThat(((Map<?, ?>) result.getBody()).get("message"))
-                .isEqualTo("Product Successfully Deleted");
+        assertThat((Map<String, String>) result.getBody())
+                .containsEntry("message", "Product Successfully Deleted");
     }
 
     @Test

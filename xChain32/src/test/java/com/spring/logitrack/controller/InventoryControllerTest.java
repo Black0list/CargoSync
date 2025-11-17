@@ -15,7 +15,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles("test")
@@ -82,7 +81,7 @@ class InventoryControllerTest {
 
     @Test
     void patch_success() {
-        when(service.adjust(eq(3L), eq(20L))).thenReturn(responseDTO);
+        when(service.adjust(3L,20L)).thenReturn(responseDTO);
 
         ResponseEntity<InventoryResponseDTO> result = controller.patch(3L, 20L);
 
