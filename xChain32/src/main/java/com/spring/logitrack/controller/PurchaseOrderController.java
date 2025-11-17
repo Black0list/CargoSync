@@ -2,7 +2,6 @@ package com.spring.logitrack.controller;
 
 import com.spring.logitrack.dto.purchaseOrder.PurchaseOrderCreateDTO;
 import com.spring.logitrack.dto.purchaseOrder.PurchaseOrderResponseDTO;
-import com.spring.logitrack.dto.salesOrder.SalesOrderResponseWithWarningsDTO;
 import com.spring.logitrack.service.PurchaseOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

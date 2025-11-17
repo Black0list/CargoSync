@@ -3,7 +3,6 @@ package com.spring.logitrack.controller;
 import com.spring.logitrack.dto.product.ProductCreateDTO;
 import com.spring.logitrack.dto.product.ProductResponseDTO;
 import com.spring.logitrack.service.ProductService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

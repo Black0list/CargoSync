@@ -1,7 +1,6 @@
 package com.spring.logitrack.controller;
 
 import com.spring.logitrack.dto.order.OrderCreateDTO;
-import com.spring.logitrack.dto.order.OrderResponseDTO;
 import com.spring.logitrack.dto.order.SimpleOrderResponseDTO;
 import com.spring.logitrack.service.SimpleOrderService;
 import jakarta.validation.Valid;

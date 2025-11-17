@@ -1,11 +1,9 @@
 package com.spring.logitrack.service;
 
 import com.spring.logitrack.dto.order.OrderCreateDTO;
-import com.spring.logitrack.dto.order.OrderResponseDTO;
 import com.spring.logitrack.dto.order.SimpleOrderResponseDTO;
 import com.spring.logitrack.entity.Product;
 import com.spring.logitrack.entity.SimpleOrder;
-import com.spring.logitrack.entity.enums.BackorderStatus;
 import com.spring.logitrack.mapper.SimpleOrderMapper;
 import com.spring.logitrack.repository.ProductRepository;
 import com.spring.logitrack.repository.SimpleOrderRepository;

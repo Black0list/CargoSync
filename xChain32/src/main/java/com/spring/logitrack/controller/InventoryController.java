@@ -2,7 +2,6 @@ package com.spring.logitrack.controller;
 
 import com.spring.logitrack.dto.inventory.InventoryCreateDTO;
 import com.spring.logitrack.dto.inventory.InventoryResponseDTO;
-import com.spring.logitrack.dto.inventory.InventoryUpdateDTO;
 import com.spring.logitrack.service.InventoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

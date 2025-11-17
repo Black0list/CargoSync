@@ -1,12 +1,10 @@
 package com.spring.logitrack.service;
 
-import com.spring.logitrack.dto.user.UserResponseDTO;
 import com.spring.logitrack.dto.warehouse.WarehouseCreateDTO;
 import com.spring.logitrack.dto.warehouse.WarehouseResponseDTO;
 import com.spring.logitrack.entity.User;
 import com.spring.logitrack.entity.Warehouse;
 import com.spring.logitrack.entity.enums.Role;
-import com.spring.logitrack.mapper.UserMapper;
 import com.spring.logitrack.mapper.WarehouseMapper;
 import com.spring.logitrack.repository.UserRepository;
 import com.spring.logitrack.repository.WarehouseRepository;
