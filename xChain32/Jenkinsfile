@@ -98,11 +98,79 @@ pipeline {
 
     post {
         success {
-            echo "🚀 Pipeline completed successfully!"
+            emailext(
+                to: "dev-team@example.com",
+                subject: "✔ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                mimeType: 'text/html',
+                body: """
+                    <html>
+                    <body style="font-family:Arial, sans-serif;">
+                        <h2 style="color:green;">✔ Build Successful</h2>
+
+                        <h3>📌 Project Information</h3>
+                        <ul>
+                            <li><b>Project:</b> ${env.JOB_NAME}</li>
+                            <li><b>Build #:</b> ${env.BUILD_NUMBER}</li>
+                            <li><b>Branch:</b> ${env.GIT_BRANCH}</li>
+                            <li><b>Duration:</b> ${currentBuild.durationString}</li>
+                        </ul>
+
+                        <h3>🛠 Commit Info</h3>
+                        <ul>
+                            <li><b>Author:</b> ${env.GIT_AUTHOR_NAME}</li>
+                            <li><b>Message:</b> ${env.GIT_COMMIT_MESSAGE}</li>
+                        </ul>
+
+                        <h3>📊 Reports</h3>
+                        <ul>
+                            <li><a href="${env.BUILD_URL}console">🔍 Build Console</a></li>
+                            <li><a href="${env.BUILD_URL}testReport">🧪 Test Report</a></li>
+                            <li><a href="https://your-sonarqube-url/dashboard?id=CargoSync">
+                                📈 SonarQube Dashboard
+                            </a></li>
+                        </ul>
+
+                        <hr>
+                        <p style="font-size:12px; color:#777;">
+                            Sent automatically by Jenkins CI - ${env.JOB_NAME}.
+                        </p>
+                    </body>
+                    </html>
+                """
+            )
         }
+
         failure {
-            echo "❌ Pipeline failed."
+            emailext(
+                to: "dev-team@example.com",
+                subject: "❌ FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                mimeType: 'text/html',
+                body: """
+                    <html>
+                    <body style="font-family:Arial, sans-serif;">
+                        <h2 style="color:red;">❌ Build Failed</h2>
+
+                        <h3>📌 Project Information</h3>
+                        <ul>
+                            <li><b>Project:</b> ${env.JOB_NAME}</li>
+                            <li><b>Build #:</b> ${env.BUILD_NUMBER}</li>
+                            <li><b>Branch:</b> ${env.GIT_BRANCH}</li>
+                        </ul>
+
+                        <h3>🔥 Error Log</h3>
+                        <p>Please check the console output:</p>
+                        <p><a href="${env.BUILD_URL}console">🔍 View Console Log</a></p>
+
+                        <h3>🧪 Test Failures</h3>
+                        <p><a href="${env.BUILD_URL}testReport">View Failed Tests</a></p>
+
+                        <p style="font-size:12px; color:#777;">
+                            Sent automatically by Jenkins CI
+                        </p>
+                    </body>
+                    </html>
+                """
+            )
         }
     }
-
 }
