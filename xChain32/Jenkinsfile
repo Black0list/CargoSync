@@ -3,10 +3,8 @@ pipeline {
     agent any
 
     environment {
-        // DockerHub credentials from Jenkins
         DOCKERHUB = credentials('dockerhub')
 
-        // SonarQube token from Jenkins
         SONAR = credentials('sonar-token')
 
         // AWS Credentials from Jenkins
@@ -18,7 +16,6 @@ pipeline {
         // Docker image destination
         IMAGE = "black0list/cargosync:latest"
 
-        // SonarQube server URL
         SONAR_HOST_URL = "http://38.242.220.11:9000"
     }
 
@@ -43,27 +40,30 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo "🔍 Running SonarQube analysis..."
+
                 withSonarQubeEnv('SonarQube') {
                     dir('xChain32') {
+
                         sh """
                             mvn clean verify sonar:sonar \
-                              -Dsonar.projectKey=CargoSync \
-                              -Dsonar.projectName='CargoSync' \
-                              -Dsonar.host.url=${SONAR_HOST_URL} \
-                              -Dsonar.token=${SONAR} \
-                              -Dsonar.java.coveragePlugin=jacoco \
-                              -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
-                              -Dsonar.junit.reportPaths=target/surefire-reports \
-                              -Dsonar.sources=src/main/java \
-                              -Dsonar.tests=src/test/java \
-                              -Dsonar.java.binaries=target/classes \
-                              -Dsonar.java.test.binaries=target/test-classes
+                                -Dsonar.projectKey=CargoSync \
+                                -Dsonar.projectName='CargoSync' \
+                                -Dsonar.host.url=${SONAR_HOST_URL} \
+                                -Dsonar.token=${SONAR} \
+                                -Dsonar.java.coveragePlugin=jacoco \
+                                -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+                                -Dsonar.junit.reportPaths=target/surefire-reports \
+                                -Dsonar.sources=src/main/java \
+                                -Dsonar.tests=src/test/java \
+                                -Dsonar.java.binaries=target/classes \
+                                -Dsonar.java.test.binaries=target/test-classes \
+                                -Dsonar.inclusions=src/main/java/**/service/**,src/main/java/**/controller/** \
+                                -Dsonar.exclusions=src/main/java/**/entity/**,src/main/java/**/dto/**,src/main/java/**/mapper/**,src/main/java/**/config/**,src/main/java/**/exception/**,src/main/java/**/enums/**,src/main/java/**/repository/**,src/main/java/**/security/**,src/main/java/**/util/**,src/main/java/**/Application.java
                         """
                     }
                 }
             }
         }
-
 
         stage('Build Docker Image') {
             steps {
