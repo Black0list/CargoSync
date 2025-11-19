@@ -98,42 +98,14 @@ pipeline {
 
     post {
         success {
-            emailext(
-                to: "abdelkebir123123@gmail.com",
-                subject: "✔ SUCCESS",
-                mimeType: 'text/html',
-                body: """
-                    <html>
-                    <body style="font-family:Arial, sans-serif;">
-                        <h2 style="color:green;">✔ Build Successful</h2>
-
-                        <hr>
-                        <p style="font-size:12px; color:#777;">
-                            Sent automatically by Jenkins CI
-                        </p>
-                    </body>
-                    </html>
-                """
-            )
+            mail to: 'abdelkebir123123@gmail.com',
+                 subject: "Build Success 🎉",
+                 body: "Pipeline finished successfully!"
         }
-
         failure {
-            emailext(
-                to: "abdelkebir123123@gmail.com",
-                subject: "❌ FAILED",
-                mimeType: 'text/html',
-                body: """
-                    <html>
-                    <body style="font-family:Arial, sans-serif;">
-                        <h2 style="color:red;">❌ Build Failed</h2>
-
-                        <p style="font-size:12px; color:#777;">
-                            Sent automatically by Jenkins CI
-                        </p>
-                    </body>
-                    </html>
-                """
-            )
+            mail to: 'abdelkebir123123@gmail.com',
+                 subject: "❌ Build Failed",
+                 body: "Something went wrong!"
         }
     }
 }
