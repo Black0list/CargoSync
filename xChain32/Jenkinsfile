@@ -99,7 +99,7 @@ pipeline {
     post {
         success {
             emailext(
-                to: "dev-team@example.com",
+                to: "abdelkebir123123@gmail.com",
                 subject: "✔ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 mimeType: 'text/html',
                 body: """
@@ -142,7 +142,7 @@ pipeline {
 
         failure {
             emailext(
-                to: "dev-team@example.com",
+                to: "abdelkebir123123@gmail.com",
                 subject: "❌ FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 mimeType: 'text/html',
                 body: """
