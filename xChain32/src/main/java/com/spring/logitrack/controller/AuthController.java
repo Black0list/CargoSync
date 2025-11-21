@@ -6,10 +6,11 @@ import com.spring.logitrack.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/api")
 public class AuthController {
 
     private final UserService service;
@@ -26,6 +27,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody UserLoginDTO dto) {
+        System.out.println("dadaw");
         return ResponseEntity.ok(service.login(dto));
     }
 }

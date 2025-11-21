@@ -8,6 +8,7 @@ import com.spring.logitrack.entity.enums.Role;
 import com.spring.logitrack.mapper.UserMapper;
 import com.spring.logitrack.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,15 +20,20 @@ public class UserService {
 
     private final UserRepository repo;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public UserResponseDTO register(UserCreateDTO dto) {
         if (repo.findByEmail(dto.getEmail()).isPresent())
             throw new IllegalArgumentException("Email already in use");
 
         User user = userMapper.toEntity(dto);
-        user.setPassword(dto.getPassword());
+
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+
         user.setActive(true);
         user.setRole(Role.CLIENT);
+
         return userMapper.toResponse(repo.save(user));
     }
 
@@ -36,11 +42,14 @@ public class UserService {
         User user = repo.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
 
-        if (!dto.getPassword().equals(user.getPassword()))
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Invalid email or password");
+        }
 
         return userMapper.toResponse(user);
     }
+
+
 
     public UserResponseDTO update(Long id, UserCreateDTO dto) {
         User u = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));

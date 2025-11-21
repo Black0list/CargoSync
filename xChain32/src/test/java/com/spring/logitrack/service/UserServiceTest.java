@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -27,6 +28,9 @@ class UserServiceTest {
 
     @Mock
     private UserRepository repo;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @Mock
     private UserMapper userMapper;
@@ -51,7 +55,7 @@ class UserServiceTest {
         User saved = new User();
         saved.setId(1L);
         saved.setEmail("user@test.com");
-        saved.setPassword("pass");
+        saved.setPassword("ENCODED");
         saved.setRole(Role.CLIENT);
         saved.setActive(true);
 
@@ -60,6 +64,10 @@ class UserServiceTest {
         response.setEmail("user@test.com");
 
         when(repo.findByEmail(dto.getEmail())).thenReturn(Optional.empty());
+
+        when(passwordEncoder.encode("pass")).thenReturn("ENCODED");
+        entity.setPassword("ENCODED"); // simulate mapper behavior
+
         when(userMapper.toEntity(dto)).thenReturn(entity);
         when(repo.save(entity)).thenReturn(saved);
         when(userMapper.toResponse(saved)).thenReturn(response);
@@ -69,6 +77,7 @@ class UserServiceTest {
         assertThat(result.getId()).isEqualTo(1L);
         verify(repo).save(entity);
     }
+
 
     @Test
     void register_emailAlreadyUsed() {
@@ -94,13 +103,14 @@ class UserServiceTest {
         User user = new User();
         user.setId(2L);
         user.setEmail("u@test.com");
-        user.setPassword("1234");
+        user.setPassword("ENCODED");
 
         UserResponseDTO response = new UserResponseDTO();
         response.setId(2L);
         response.setEmail("u@test.com");
 
         when(repo.findByEmail(dto.getEmail())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("1234", "ENCODED")).thenReturn(true);
         when(userMapper.toResponse(user)).thenReturn(response);
 
         UserResponseDTO result = service.login(dto);
