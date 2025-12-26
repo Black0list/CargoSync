@@ -6,6 +6,7 @@ import com.spring.logitrack.service.InventoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/inventories")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('WAREHOUSE_MANAGER', 'ADMIN')")
 public class InventoryController {
 
     private final InventoryService service;

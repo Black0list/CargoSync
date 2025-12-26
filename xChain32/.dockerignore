@@ -1,0 +1,12 @@
+target/
+.idea/
+.vscode/
+*.iws
+*.iml
+*.ipr
+.git/
+.gitignore
+*.md
+docker-compose.yml
+.env
+HELP.md

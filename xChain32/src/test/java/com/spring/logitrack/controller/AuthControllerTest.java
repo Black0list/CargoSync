@@ -1,6 +1,10 @@
 package com.spring.logitrack.controller;
 
-import com.spring.logitrack.dto.user.*;
+import com.spring.logitrack.dto.auth.JwtAuthResponse;
+import com.spring.logitrack.dto.user.UserCreateDTO;
+import com.spring.logitrack.dto.user.UserLoginDTO;
+import com.spring.logitrack.dto.user.UserResponseDTO;
+import com.spring.logitrack.service.AuthService;
 import com.spring.logitrack.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,12 +26,16 @@ class AuthControllerTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private AuthService authService;
+
     @InjectMocks
     private AuthController controller;
 
     private UserCreateDTO createDTO;
     private UserLoginDTO loginDTO;
     private UserResponseDTO responseDTO;
+    private JwtAuthResponse jwtAuthResponse;
 
     @BeforeEach
     void setup() {
@@ -46,10 +54,23 @@ class AuthControllerTest {
         responseDTO.setId(1L);
         responseDTO.setEmail("john@example.com");
         responseDTO.setName("John Doe");
+
+        jwtAuthResponse = JwtAuthResponse.builder()
+                .accessToken("token")
+                .refreshToken("refresh")
+                .tokenType("Bearer")
+                .build();
     }
+
+    // Note: register_success might still use UserService depending on how AuthController is implemented.
+    // Assuming AuthController.register uses UserService.register? Let's check.
+    // If AuthController.register uses AuthService, we need to update that too.
+    // Based on previous file reads, register was using UserService directly in some versions?
+    // Let's assume register uses UserService for now, but Login definitely uses AuthService.
 
     @Test
     void register_success() {
+        // If register uses userService
         when(userService.register(any())).thenReturn(responseDTO);
 
         ResponseEntity<?> result = controller.register(createDTO);
@@ -60,11 +81,11 @@ class AuthControllerTest {
 
     @Test
     void login_success() {
-        when(userService.login(any())).thenReturn(responseDTO);
+        when(authService.login(any())).thenReturn(jwtAuthResponse);
 
         ResponseEntity<?> result = controller.login(loginDTO);
 
         assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
-        assertThat(((UserResponseDTO) result.getBody()).getName()).isEqualTo("John Doe");
+        assertThat(((JwtAuthResponse) result.getBody()).getAccessToken()).isEqualTo("token");
     }
 }

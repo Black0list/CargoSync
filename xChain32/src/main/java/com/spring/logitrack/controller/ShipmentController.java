@@ -7,6 +7,7 @@ import com.spring.logitrack.service.ShipmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/shipments")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('WAREHOUSE_MANAGER', 'ADMIN')")
 public class ShipmentController {
 
     private final ShipmentService service;

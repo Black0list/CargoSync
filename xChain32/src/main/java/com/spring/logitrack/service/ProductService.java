@@ -16,13 +16,17 @@ import com.spring.logitrack.repository.ProductRepository;
 import com.spring.logitrack.repository.SalesOrderLineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class ProductService {
 
     private final ProductRepository repo;
@@ -55,6 +59,7 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "products", key = "#id")
     public ProductResponseDTO get(Long id) {
         Product product = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not Found"));
@@ -98,6 +103,7 @@ public class ProductService {
     }
 
 
+    @CacheEvict(value = "products", key = "#id")
     public ProductResponseDTO update(Long id, ProductCreateDTO dto) {
         try {
             Product product = repo.findById(id)
@@ -128,6 +134,7 @@ public class ProductService {
         }
     }
 
+    @CacheEvict(value = "products", allEntries = true)
     public ProductResponseDTO updateStatus(String sku, boolean status) {
         Product product = repo.findBySku(sku)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not Found"));
@@ -166,6 +173,7 @@ public class ProductService {
         return mapper.toResponse(repo.save(product));
     }
 
+    @CacheEvict(value = "products", key = "#id")
     public void delete(Long id, boolean hard) {
         Product product = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not Found"));

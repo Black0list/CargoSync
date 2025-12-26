@@ -23,9 +23,7 @@ public class ProductController {
     public ProductController(ProductService service) {
         this.service = service;
     }
-
-
-    @PreAuthorize("hasAnyRole('CLIENT')")
+    
     @GetMapping
     public ResponseEntity<?> list() {
         try {
@@ -50,6 +48,7 @@ public class ProductController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@ModelAttribute ProductCreateDTO dto) {
         try {
@@ -62,6 +61,7 @@ public class ProductController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody ProductCreateDTO dto) {
         try {
@@ -74,6 +74,7 @@ public class ProductController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{sku}")
     public ResponseEntity<?> update(@PathVariable String sku, @RequestParam boolean status) {
         try {
@@ -86,6 +87,7 @@ public class ProductController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<?> delete(@PathVariable Long id, @RequestParam(defaultValue = "false") boolean hard) {

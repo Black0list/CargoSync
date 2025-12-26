@@ -1,33 +1,45 @@
 package com.spring.logitrack.controller;
 
-import com.spring.logitrack.dto.user.UserLoginDTO;
+import com.spring.logitrack.dto.auth.JwtAuthResponse;
+import com.spring.logitrack.dto.auth.RefreshTokenRequest;
 import com.spring.logitrack.dto.user.UserCreateDTO;
+import com.spring.logitrack.dto.user.UserLoginDTO;
+import com.spring.logitrack.service.AuthService;
 import com.spring.logitrack.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class AuthController {
 
-    private final UserService service;
+    private final AuthService authService;
+    private final UserService userService;
 
-    @Autowired
-    public AuthController(UserService service) {
-        this.service = service;
+    @PostMapping("/auth/register")
+    public ResponseEntity<?> register(@Valid @RequestBody UserCreateDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(dto));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody UserCreateDTO dto) {
-        return ResponseEntity.ok(service.register(dto));
+    @PostMapping("/auth/login")
+    public ResponseEntity<JwtAuthResponse> login(@Valid @RequestBody UserLoginDTO loginDto) {
+        return ResponseEntity.ok(authService.login(loginDto));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody UserLoginDTO dto) {
-        System.out.println("dadaw");
-        return ResponseEntity.ok(service.login(dto));
+    public ResponseEntity<JwtAuthResponse> loginOld(@Valid @RequestBody UserLoginDTO loginDto) {
+         return ResponseEntity.ok(authService.login(loginDto));
+    }
+
+    @PostMapping("/auth/refresh")
+    public ResponseEntity<JwtAuthResponse> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+        return ResponseEntity.ok(authService.refreshToken(refreshTokenRequest));
     }
 }
